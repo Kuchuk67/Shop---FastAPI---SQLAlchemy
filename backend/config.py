@@ -8,8 +8,8 @@ import os
 BASE_DIR = Path(__file__)
 
 class Setting(BaseSettings):
-    # версия api
-    api_prefix: str = "/api/v1"
+    
+
 
     DB_HOST: str
     DB_PORT: int
@@ -24,6 +24,8 @@ class Setting(BaseSettings):
     #db_url: str = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
 
     SECRET_KEY: str
+    ACCESS_TOKEN_EXPIRE_MINUTES: int
+    FRESH_TOKEN_EXPIRE_MINUTES: int
    
     # Алгоритм шифрования токена
     ALGORITHM: str
@@ -41,6 +43,11 @@ class Setting(BaseSettings):
     @property 
     def role(self):
         return tuple(self.ROLES.split(","))
+    
+    @property 
+    def api_prefix(self):
+        # версия api
+        return "/api/v1"
     
     @property  
     def db_url(self):  

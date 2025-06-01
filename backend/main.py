@@ -1,11 +1,13 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from contextlib import asynccontextmanager
-from databases import Database
-from pydantic import BaseModel
-from app.models.base import Base
-from app.models.db_helper import db_helper
+
+from app.core.models.base import Base
+from app.core.models.db_helper import db_helper
+
 
 from config import setting
+from app.core.headers import CommonHeaders
+from app.users.views import router as user_router, router_authen as user_router_authen
 
 # URL для PostgreSQL (ЗАМЕНИТЕ user, password, localhost, dbname на свои реальные данные!)
 # DATABASE_URL = "postgresql://postgres:54321@localhost/shop"
@@ -19,4 +21,13 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-#print(type(setting.DEBAG))
+
+# подключаем дополнительные роуторы - views
+app.include_router(user_router)
+app.include_router(user_router_authen)
+
+
+@app.get("/")
+async def root(request: Request):
+    """ тут провто отдает Hello World """
+    return {"message": "Hello World"}

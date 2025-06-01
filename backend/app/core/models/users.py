@@ -6,5 +6,5 @@ class User(Base):
     email: Mapped[str]
     phone: Mapped[int]
     password: Mapped[str]
-    password:  Mapped[str]
+
     
