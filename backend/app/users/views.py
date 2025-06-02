@@ -13,37 +13,24 @@ from app.core.models import db_helper, User as UserDB
 router = APIRouter(prefix=f"{setting.api_prefix}/user", tags=["Users"])
 router_authen = APIRouter(prefix=f"{setting.api_prefix}", tags=["Users_Authen"])
 
+
 @router.get("",response_model=list[UserGet])
-async def get_users(
-        session: AsyncSession = Depends(db_helper.session_dependency), 
-    ) -> list[UserDB]:
-    users =  await crud.get_users(session=session)
-    if users is not None:
-        return list(users)
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND
-    )
+async def get_users() -> list[UserDB]:
+    return  await crud.get_users()
+
 
 @router.get("/{user_id}/", response_model=UserGet)
-async def get_user(
-        user_id: int,
-        session: AsyncSession = Depends(db_helper.session_dependency), 
-    ) -> [UserDB]:
-    user = await session.get(UserDB, user_id)
-    if user is not None:
-        return user
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND
-    )
+async def get_user(user_id: int) -> [UserDB]:
+    return crud.get_user(user_id)
 
-# @router.post("")
-# async def create_user(user: User):
-#     """ Принимем POST запрос JOSN
-#     по модели CreateUser
-#     """
-#     session: AsyncSession = Depends(db_helper.scoped_session_dependency)
-#     # Передаем запрос в круд на создание пользователя
-#     return crud.get_user()
+
+@router.post("")
+async def create_user(user: User):
+    """ Принимем POST запрос JOSN
+    по модели CreateUser
+    """
+    # Передаем запрос в круд на создание пользователя
+    return crud.create_user()
 
 # # Пути аутентификации пользователя
 # @router_authen.get("/registration")
