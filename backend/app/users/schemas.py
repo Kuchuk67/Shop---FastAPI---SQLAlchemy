@@ -10,7 +10,7 @@ class User(BaseModel):
     phone: int
     password: str
     disabled: bool = False
-    roles: tuple[str] = ('user',) # Список ролей пользователя
+    roles: str = 'user' # Список ролей пользователя
 
 
 class UserGet(User):

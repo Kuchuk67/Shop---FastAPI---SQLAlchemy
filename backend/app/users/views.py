@@ -7,7 +7,7 @@ from app.users.schemas import User, LoginUser, UserGet
 from app.core.security import get_password_hash, verify_password
 from sqlalchemy.ext.asyncio import AsyncSession
 from config import setting
-from app.core.models import db_helper
+from app.core.models import db_helper, User as UserDB
 
 # Добавляем префикс и тег для DOCS
 router = APIRouter(prefix=f"{setting.api_prefix}/user", tags=["Users"])
@@ -16,21 +16,25 @@ router_authen = APIRouter(prefix=f"{setting.api_prefix}", tags=["Users_Authen"])
 @router.get("",response_model=list[UserGet])
 async def get_users(
         session: AsyncSession = Depends(db_helper.session_dependency), 
-    ):
+    ) -> list[UserDB]:
     users =  await crud.get_users(session=session)
     if users is not None:
-        return users
+        return list(users)
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND
     )
 
 @router.get("/{user_id}/", response_model=UserGet)
-async def get_product(
+async def get_user(
         user_id: int,
         session: AsyncSession = Depends(db_helper.session_dependency), 
-    ):
-    return await session.get(User, user_id)
-
+    ) -> [UserDB]:
+    user = await session.get(UserDB, user_id)
+    if user is not None:
+        return user
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND
+    )
 
 # @router.post("")
 # async def create_user(user: User):

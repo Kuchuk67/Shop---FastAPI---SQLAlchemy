@@ -1,8 +1,11 @@
+from fastapi import APIRouter, Request, Depends, HTTPException, status
 from app.users.schemas import User
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.models import User
 from sqlalchemy import select
 from sqlalchemy.engine import Result
+
+from app.core.models import db_helper, User as UserDB
 
 # def create_user2(user_in: User):
 #     user = user_in.model_dump()
@@ -10,6 +13,7 @@ from sqlalchemy.engine import Result
 #         "success": True,
 #         "user": user,
 #     }
+
 
 async def get_users(session: AsyncSession) -> tuple[User] | None:
     #user = User(**user_in.model_dump())
@@ -19,8 +23,5 @@ async def get_users(session: AsyncSession) -> tuple[User] | None:
     return tuple(users)
 
 async def get_user(user_id, session: AsyncSession) -> User | None:
-    #user = User(**user_in.model_dump())
-    stmt=select(User)
-    result: Result = await session.execute(stmt)
-    users = result.scalars().all()
-    return tuple(users)
+
+    ...
