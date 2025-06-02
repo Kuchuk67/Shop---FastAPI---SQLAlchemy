@@ -14,22 +14,22 @@ router = APIRouter(prefix=f"{setting.api_prefix}/user", tags=["Users"])
 router_authen = APIRouter(prefix=f"{setting.api_prefix}", tags=["Users_Authen"])
 
 @router.get("",response_model=list[UserGet])
-async def get_user(
+async def get_users(
         session: AsyncSession = Depends(db_helper.session_dependency), 
     ):
-    user =  await crud.get_user(session=session)
-    if user is not None:
-        return user
+    users =  await crud.get_users(session=session)
+    if users is not None:
+        return users
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND
     )
 
 @router.get("/{user_id}/", response_model=UserGet)
 async def get_product(
-        user_id,
+        user_id: int,
         session: AsyncSession = Depends(db_helper.session_dependency), 
     ):
-    user =  await crud.get_user(user_id: int, session=session)
+    return await session.get(User, user_id)
 
 
 # @router.post("")

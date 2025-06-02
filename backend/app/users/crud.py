@@ -11,7 +11,14 @@ from sqlalchemy.engine import Result
 #         "user": user,
 #     }
 
-async def get_user(session: AsyncSession) -> tuple[User] | None:
+async def get_users(session: AsyncSession) -> tuple[User] | None:
+    #user = User(**user_in.model_dump())
+    stmt=select(User)
+    result: Result = await session.execute(stmt)
+    users = result.scalars().all()
+    return tuple(users)
+
+async def get_user(user_id, session: AsyncSession) -> User | None:
     #user = User(**user_in.model_dump())
     stmt=select(User)
     result: Result = await session.execute(stmt)
