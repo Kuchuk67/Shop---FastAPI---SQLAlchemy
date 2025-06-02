@@ -24,11 +24,13 @@ async def get_user(
         status_code=status.HTTP_404_NOT_FOUND
     )
 
-# @router.get("/{product_id}/", response_model=UserGet)
-# async def get_product(
-#     user: User = Depends(product_by_id),
-# ):
-#     return user
+@router.get("/{user_id}/", response_model=UserGet)
+async def get_product(
+        user_id,
+        session: AsyncSession = Depends(db_helper.session_dependency), 
+    ):
+    user =  await crud.get_user(user_id: int, session=session)
+
 
 # @router.post("")
 # async def create_user(user: User):
