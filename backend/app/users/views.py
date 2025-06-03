@@ -15,22 +15,26 @@ router_authen = APIRouter(prefix=f"{setting.api_prefix}", tags=["Users_Authen"])
 
 
 @router.get("",response_model=list[UserGet])
-async def get_users() -> list[UserDB]:
-    return  await crud.get_users()
+async def get_users(session: AsyncSession = Depends(db_helper.session_dependency)
+                    ) -> list[UserDB]:
+    #session: AsyncSession = Depends(db_helper.session_dependency)
+    return  await crud.get_users(session=session)
 
 
 @router.get("/{user_id}/", response_model=UserGet)
-async def get_user(user_id: int) -> [UserDB]:
-    return crud.get_user(user_id)
+async def get_user(user_id: int,
+                   session: AsyncSession = Depends(db_helper.session_dependency)
+                   ) -> [UserDB]:
+    return await crud.get_user(user_id, session=session)
 
 
 @router.post("")
-async def create_user(user: User):
+async def create_user(request = Request, session: AsyncSession = Depends(db_helper.session_dependency)):
     """ Принимем POST запрос JOSN
     по модели CreateUser
     """
     # Передаем запрос в круд на создание пользователя
-    return crud.create_user()
+    return crud.create_user(request=request, session=session)
 
 # # Пути аутентификации пользователя
 # @router_authen.get("/registration")

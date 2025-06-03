@@ -8,11 +8,11 @@ from sqlalchemy.engine import Result
 from app.core.models import db_helper, User as UserDB
 
 
-async def get_users() -> list[UserDB]:
+async def get_users(session: AsyncSession) -> list[UserDB]:
     """
     Выводит всех пользователей
     """
-    session: AsyncSession = Depends(db_helper.session_dependency)
+
     stmt=select(User)
     result: Result = await session.execute(stmt)
     users = result.scalars().all()
@@ -23,12 +23,12 @@ async def get_users() -> list[UserDB]:
     )
 
 
-async def get_user(user_id) -> [UserDB]:
+async def get_user(user_id, session: AsyncSession) -> [UserDB]:
     """
     Выводит пользователя по ID
     """
-    session: AsyncSession = Depends(db_helper.session_dependency)
-    user = await session.get(UserDB, user_id)
+
+    user = await session.get(User, user_id)
     if user is not None:
         return user
     raise HTTPException(
@@ -36,9 +36,9 @@ async def get_user(user_id) -> [UserDB]:
     )
 
 
-async def create_user():
+# async def create_user():
     """
     Создает нового пользователя
     """
-    session: AsyncSession = Depends(db_helper.session_dependency)
+    # session: AsyncSession = Depends(db_helper.session_dependency)
 
