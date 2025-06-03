@@ -36,9 +36,17 @@ async def get_user(user_id, session: AsyncSession) -> [UserDB]:
     )
 
 
-# async def create_user():
+async def create_user(user_in, session: AsyncSession):
     """
     Создает нового пользователя
     """
-    # session: AsyncSession = Depends(db_helper.session_dependency)
+    # Нужна проверка на наличие похожих email и телефона в БД
+    user = session.query(UserDB).filter_by(email=user_in["email"])
+    user = UserDB(**user_in.model_dump())
+    session.add(user)
+    await session.commit()
+    # await session.refresh(product)
+    return user
+
+    #session: AsyncSession = Depends(db_helper.session_dependency)
 

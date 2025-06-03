@@ -3,14 +3,14 @@ from fastapi import APIRouter, Request, Depends, HTTPException, status
 from app.users import crud
 from app.core.models.db_helper import db_helper
 from config import setting
-from app.users.schemas import User, LoginUser, UserGet
+from app.users.schemas import User, LoginUser, UserGet, UserCreate
 from app.core.security import get_password_hash, verify_password
 from sqlalchemy.ext.asyncio import AsyncSession
 from config import setting
 from app.core.models import db_helper, User as UserDB
 
 # Добавляем префикс и тег для DOCS
-router = APIRouter(prefix=f"{setting.api_prefix}/user", tags=["Users"])
+router = APIRouter(prefix=f"{setting.api_prefix}/users", tags=["Users"])
 router_authen = APIRouter(prefix=f"{setting.api_prefix}", tags=["Users_Authen"])
 
 
@@ -29,14 +29,19 @@ async def get_user(user_id: int,
 
 
 @router.post("")
-async def create_user(request = Request, session: AsyncSession = Depends(db_helper.session_dependency)):
-    """ Принимем POST запрос JOSN
-    по модели CreateUser
+async def create_user(user_in: UserCreate,
+                      session: AsyncSession = Depends(db_helper.session_dependency)
+                      ):
+    """
+    Принимем POST запрос по схеме UserCreate
     """
     # Передаем запрос в круд на создание пользователя
-    return crud.create_user(request=request, session=session)
+    return await crud.create_user(
+        user_in=user_in,
+        session=session
+    )
 
-# # Пути аутентификации пользователя
+# Пути аутентификации пользователя
 # @router_authen.get("/registration")
 # async def registration_form(): 
 #     """
