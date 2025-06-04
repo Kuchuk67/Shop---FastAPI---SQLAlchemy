@@ -7,7 +7,7 @@ from app.core.models.db_helper import db_helper
 
 from config import setting
 from app.core.headers import CommonHeaders
-from app.users.views import router as user_router, router_authen as user_router_authen
+from app.users.views import router as user_router, router_authentication as user_router_authentication
 
 # URL для PostgreSQL (ЗАМЕНИТЕ user, password, localhost, dbname на свои реальные данные!)
 # DATABASE_URL = "postgresql://postgres:54321@localhost/shop"
@@ -24,7 +24,7 @@ app = FastAPI(lifespan=lifespan)
 
 # подключаем дополнительные роуторы - views
 app.include_router(user_router)
-app.include_router(user_router_authen)
+app.include_router(user_router_authentication)
 
 
 @app.get("/")

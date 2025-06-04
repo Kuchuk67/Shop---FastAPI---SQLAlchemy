@@ -1,6 +1,6 @@
 
-from fastapi import APIRouter, Request, Depends, HTTPException, status
-from app.users import crud
+from fastapi import APIRouter, Request, Depends, HTTPException, status, Response
+from app.users import crud, authorization
 from app.core.models.db_helper import db_helper
 from config import setting
 from app.users.schemas import User, LoginUser, UserGet, UserCreate
@@ -11,7 +11,7 @@ from app.core.models import db_helper, User as UserDB
 
 # Добавляем префикс и тег для DOCS
 router = APIRouter(prefix=f"{setting.api_prefix}/users", tags=["Users"])
-router_authen = APIRouter(prefix=f"{setting.api_prefix}", tags=["Users_Authen"])
+router_authentication = APIRouter(prefix=f"{setting.api_prefix}", tags=["Users_Authen"])
 
 
 @router.get("",response_model=list[UserGet])
@@ -28,18 +28,35 @@ async def get_user(user_id: int,
     return await crud.get_user(user_id, session=session)
 
 
-@router.post("")
+@router_authentication.post("/registration/", status_code=201)
 async def create_user(user_in: UserCreate,
                       session: AsyncSession = Depends(db_helper.session_dependency)
                       ):
     """
     Принимем POST запрос по схеме UserCreate
     """
+    user_in.password = get_password_hash(user_in.password)
     # Передаем запрос в круд на создание пользователя
     return await crud.create_user(
         user_in=user_in,
         session=session
     )
+
+
+@router_authentication.post("/login/")
+async def login_user(user_in: LoginUser,
+                      session: AsyncSession = Depends(db_helper.session_dependency)
+                      ):
+    """
+    проверяет учетные данные пользователя
+    и возвращает JWT токен, если данные правильные.\n
+    login: email пользователя или телефон +7..........
+    """
+    return await authorization.login_user(
+        user_in=user_in,
+        session=session
+    )
+
 
 # Пути аутентификации пользователя
 # @router_authen.get("/registration")

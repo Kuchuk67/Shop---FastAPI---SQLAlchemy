@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.models import User
 from sqlalchemy import select
 from sqlalchemy.engine import Result
+from fastapi.responses import JSONResponse
 
 from app.core.models import db_helper, User as UserDB
 
@@ -41,12 +42,31 @@ async def create_user(user_in, session: AsyncSession):
     Создает нового пользователя
     """
     # Нужна проверка на наличие похожих email и телефона в БД
-    user = session.query(UserDB).filter_by(email=user_in["email"])
-    user = UserDB(**user_in.model_dump())
-    session.add(user)
-    await session.commit()
-    # await session.refresh(product)
-    return user
+    statement = select(UserDB).where((UserDB.email == user_in.email) | (UserDB.phone == user_in.phone))
+    result = await session.execute(statement)
+    users = result.scalars().first()
 
-    #session: AsyncSession = Depends(db_helper.session_dependency)
+    # Создаем нового пользователя
+    if not users:
+        user = UserDB(**user_in.model_dump())
+        session.add(user)
+        await session.commit()
+        return user
+
+    # Если дублирование, то статус 202
+    if users.email == user_in.email:
+        return JSONResponse(
+            content={"detail": "Such user exists", "email": user_in.email},
+            status_code=202
+        )
+    if users.phone == user_in.phone:
+        return JSONResponse(
+            content={"detail": "Such user exists", "phone": user_in.phone},
+            status_code=202
+        )
+    return JSONResponse(
+        content={"detail": "Such user exists"},
+        status_code=202
+    )
+
 
