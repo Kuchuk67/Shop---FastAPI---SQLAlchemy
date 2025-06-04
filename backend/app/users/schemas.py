@@ -1,6 +1,3 @@
-from contextlib import nullcontext
-from lib2to3.pgen2.tokenize import blank_re
-
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, constr
 
 class UserBase(BaseModel):
