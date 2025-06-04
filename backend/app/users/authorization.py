@@ -31,14 +31,16 @@ async def login_user(user_in, session: AsyncSession):
     if "@" in user_in.login:
         statement = select(UserDB).where(UserDB.email == user_in.login)
     else:
-        user_in.login = int(user_in.login[2:])
+        user_in.login = user_in.login[2:]
         statement = select(UserDB).where(UserDB.phone == user_in.login)
     result = await session.execute(statement)
     users = result.scalars().first()
     if users:
         # Если нашли пользователя с таким логином
         # сравниваем пароли
+        #print(user_in.password, users.password)
         if verify_password(user_in.password, users.password):
+            ...
             # Если проверка прошла успешно, генерируем токен для пользователя
             token = create_jwt_token({"sub": users.id},
                                      setting.ACCESS_TOKEN_EXPIRE_MINUTES)  # "sub" — это subject, в нашем случае имя пользователя

@@ -9,7 +9,7 @@ class UserBase(BaseModel):
     """
     full_name: str = Field(..., min_length=3, max_length=30)
     email: EmailStr
-    phone: int
+    phone: str
 
 
 class User(UserBase):
