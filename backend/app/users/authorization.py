@@ -13,25 +13,10 @@ async def login_user(user_in, session: AsyncSession):
     """
     Авторизация пользователя
     """
-
-    # В реальной практике пароли необходимо сравнивать с хэшами, а не в открытом виде
-    # password_h = get_password_hash(user_login.password)
-    '''    for user in USERS_DATA:
-        if user.get("username") == user_login.username and verify_password(user_login.password, user.get("password")):
-            # Если проверка прошла успешно, генерируем токен для пользователя
-            token = create_jwt_token({"sub": user_login.username},
-                                     ACCESS_TOKEN_EXPIRE_MINUTES)  # "sub" — это subject, в нашем случае имя пользователя
-            token_refresh = create_jwt_token({"iss": user_login.username}, FRESH_TOKEN_EXPIRE_MINUTES)
-            return {"access_token": token,
-                    "token_type": "bearer",
-                    "refresh_token": token_refresh}
-    # Если данные неверные, возвращаем ошибку
-    return {"error": "Ошибка пары пароль-логин"}'''
-
     if "@" in user_in.login:
         statement = select(UserDB).where(UserDB.email == user_in.login)
     else:
-        user_in.login = user_in.login[2:]
+        #user_in.login = user_in.login[2:]
         statement = select(UserDB).where(UserDB.phone == user_in.login)
     result = await session.execute(statement)
     users = result.scalars().first()

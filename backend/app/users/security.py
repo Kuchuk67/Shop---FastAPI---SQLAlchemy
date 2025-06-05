@@ -35,7 +35,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
  # Время жизни токена
 
 # Функция для создания JWT токена с заданным временем жизни
-def create_jwt_token(data: Dict, expires_delta: timedelta):
+def create_jwt_token(data: Dict, expires_delta: int):
     """
     Функция для создания JWT токена. Мы копируем входные данные,
     добавляем время истечения и кодируем токен.

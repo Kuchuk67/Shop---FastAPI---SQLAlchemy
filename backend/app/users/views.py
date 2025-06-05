@@ -4,24 +4,35 @@ from app.users import crud, authorization
 from app.core.models.db_helper import db_helper
 from config import setting
 from app.users.schemas import User, LoginUser, UserGet, UserCreate
-from app.core.security import get_password_hash, verify_password
+from app.core.security import get_password_hash
 from sqlalchemy.ext.asyncio import AsyncSession
 from config import setting
 from app.core.models import db_helper, User as UserDB
+from app.users.rbac import PermissionRole
 
-# Добавляем префикс и тег для DOCS
+# Добавляем префикс
 router = APIRouter(prefix=f"{setting.api_prefix}/users", tags=["Users"])
 router_authentication = APIRouter(prefix=f"{setting.api_prefix}", tags=["Users_Authen"])
 
 
-@router.get("",response_model=list[UserGet])
-async def get_users(session: AsyncSession = Depends(db_helper.session_dependency)
+@router.get("/list/",response_model=list[UserGet])
+@PermissionRole(["admin"])
+async def get_users_list(session: AsyncSession = Depends(db_helper.session_dependency)
                     ) -> list[UserDB]:
     #session: AsyncSession = Depends(db_helper.session_dependency)
     return  await crud.get_users(session=session)
 
 
+@router.get("",response_model=list[UserGet])
+#@PermissionRole(["admin", "user"])
+async def get_users(session: AsyncSession = Depends(db_helper.session_dependency)
+                    ) -> list[UserDB]:
+    #session: AsyncSession = Depends(db_helper.session_dependency)
+    return  await crud.get_user_current(session=session)
+
+
 @router.get("/{user_id}/", response_model=UserGet)
+@PermissionRole(["admin"])
 async def get_user(user_id: int,
                    session: AsyncSession = Depends(db_helper.session_dependency)
                    ) -> [UserDB]:

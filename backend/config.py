@@ -8,8 +8,6 @@ import os
 BASE_DIR = Path(__file__)
 
 class Setting(BaseSettings):
-    
-
 
     DB_HOST: str
     DB_PORT: int

@@ -6,7 +6,7 @@ class UserBase(BaseModel):
     """
     full_name: str = Field(..., min_length=3, max_length=30)
     email: EmailStr
-    phone: str
+    phone: constr(pattern=r"\+7[0-9]{10}")
 
 
 class User(UserBase):
