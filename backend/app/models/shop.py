@@ -25,7 +25,8 @@ class Сart(Base):
     product_id: Mapped[int] = mapped_column(nullable=False)
     price: Mapped[int] = mapped_column(nullable=False)
     
-
+ 
+ 
     name: Mapped[str] = mapped_column(nullable=False)
     description:  Mapped[str]
     price: Mapped[int] = mapped_column(nullable=False)
