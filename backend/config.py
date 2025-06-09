@@ -1,6 +1,7 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pathlib import Path
 import os
+import sys
 
 # Конфигурация приложения
 # Константы должны быть прописаны в Файле .env
@@ -48,11 +49,15 @@ class Setting(BaseSettings):
         return "/api/v1"
     
     @property  
-    def db_url(self):  
-        return (
-            f"postgresql+asyncpg://"
-            f"{self.DB_USER}:{self.DB_PASSWORD}"
-            f"@{self.DB_HOST}/{self.DB_NAME}"
-        ) 
+    def db_url(self): 
+        if "main:app" in sys.argv:
+            return (
+                f"postgresql+asyncpg://"
+                f"{self.DB_USER}:{self.DB_PASSWORD}"
+                f"@{self.DB_HOST}/{self.DB_NAME}"
+            )
+        else:
+            return "postgresql+asyncpg://postgres:54321@localhost:5432/test_shop"
+
     
-setting = Setting()
+setting = Setting() # type: ignore
