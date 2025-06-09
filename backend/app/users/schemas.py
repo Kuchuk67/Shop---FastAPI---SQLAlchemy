@@ -55,3 +55,9 @@ class LoginUser(BaseModel):
     # login может быть телефоном или email
     login: str = Field(..., pattern=r"\+7[0-9]{10}|^\S+@\S+\.\S+$")
     password: str
+
+
+class UserPatch(BaseModel):
+    disabled: bool | None
+    roles: str | None
+

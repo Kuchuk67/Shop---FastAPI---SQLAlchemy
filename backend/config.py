@@ -55,9 +55,12 @@ class Setting(BaseSettings):
                 f"postgresql+asyncpg://"
                 f"{self.DB_USER}:{self.DB_PASSWORD}"
                 f"@{self.DB_HOST}/{self.DB_NAME}"
-            )
+                )
         else:
-            return "postgresql+asyncpg://postgres:54321@localhost:5432/test_shop"
-
+            return (
+                f"postgresql+asyncpg://"
+                f"{self.DB_USER}:{self.DB_PASSWORD}"
+                f"@{self.DB_HOST}/test_shop"
+                )
     
 setting = Setting() # type: ignore

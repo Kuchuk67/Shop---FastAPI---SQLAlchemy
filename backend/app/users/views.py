@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from app.users import crud, authorization
-from app.users.schemas import LoginUser, UserGet, UserCreate
+from app.users.schemas import LoginUser, UserGet, UserCreate, UserPatch
 from app.users.security import get_password_hash, get_current_user
 from sqlalchemy.ext.asyncio import AsyncSession
 from config import setting
@@ -57,19 +57,35 @@ async def get_user(
     return await crud.get_user(user_id, session=session)
 
 
-@router.patch("/id-{user_id}/disabled/{disable}", response_model=UserGet)
-#@PermissionRole(["admin"])
+@router.patch("/id-{user_id}/patch/", response_model=UserGet)
+@PermissionRole(["admin"])
 async def user_disable(
     user_id: int, 
-    disable: bool,
-    session: AsyncSession = Depends(db_helper.session_dependency)
+    user_patch_data: UserPatch,
+    session: AsyncSession = Depends(db_helper.session_dependency),
+    current_user: UserGet = Depends(get_current_user)
 ):
     """
-    отключает пользователя
+    Вносит изменения в сущнось пользователя.
+    Отключает пользователя.
+    Меняет роль.
     """
-    return await crud.disable_user(user_id, disable, session=session)
+    return await crud.patch_user(user_id, user_patch_data, session=session)
 
 
+@router.post("/id-{user_id}/delete/")
+@PermissionRole(["admin"])
+async def user_delete(
+    user_id: int,
+    session: AsyncSession = Depends(db_helper.session_dependency),
+    current_user: UserGet = Depends(get_current_user)
+):
+    """
+    Удалит пользователя совсем
+    """
+    return await crud.user_delete(user_id, session=session)
+
+'''
 @router.patch("/id-{user_id}/role/{role}/", response_model=UserGet)
 #@PermissionRole(["admin"])
 async def user_role(
@@ -80,7 +96,7 @@ async def user_role(
     """
     меняет роль  пользователя
     """
-    return await crud.user_roles(user_id, role, session=session)
+    return await crud.user_roles(user_id, role, session=session)'''
 
 
 @router_authentication.post("/registration/", status_code=201)

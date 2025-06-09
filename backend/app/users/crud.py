@@ -87,7 +87,7 @@ async def create_user(user_in, session: AsyncSession):
     )
 
 
-async def disable_user(user_in, disable, session: AsyncSession):
+'''async def disable_user(user_in, disable, session: AsyncSession):
     """
     Отключает пользователя
     """
@@ -123,10 +123,45 @@ async def user_roles(user_in, role,  session: AsyncSession):
         return JSONResponse(status_code=422, content={ "message": "Такая роль не существует"})
     await session.commit() # сохраняем изменения 
     await session.refresh(user)
+    return user'''
+
+
+async def patch_user(user_in, user_patch_data, session: AsyncSession):
+    """
+    Patch пользователя
+    """
+    # получаем пользователя по id
+    user = await session.get(UserDB, user_in)
+    # если не найден, отправляем статусный код и сообщение об ошибке
+    if not user:
+        return JSONResponse(status_code=404, content={"detail": "Пользователь не найден"})
+    # если пользователь найден, изменяем его данные и отправляем обратно клиенту
+    # меняем роль
+    if user_patch_data.roles in setting.role:
+        user.roles = user_patch_data.roles
+    elif not user_patch_data.roles:
+        pass
+    else:
+        return JSONResponse(status_code=422, content={ "detail": "Такая роль не существует"})
+    # меняем активность пользователя
+    if user_patch_data.disabled:
+        user.disabled = user_patch_data.disabled
+
+    # Сохраняем
+    await session.commit()
+    await session.refresh(user)
     return user
 
 async def user_delete(user_in, session: AsyncSession):
     """
     Удаляет пользователя
     """
-    ...
+    # получаем пользователя по id
+    user = await session.get(UserDB, user_in)
+    # если не найден, отправляем статусный код и сообщение об ошибке
+    if not user:
+        return JSONResponse(status_code=404, content={"detail": "Пользователь не найден"})
+    # Удаляем
+    await session.delete(user)
+    await session.commit()
+    return JSONResponse(status_code=200, content={"detail": "Пользователь удален"})
