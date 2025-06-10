@@ -1,4 +1,4 @@
-from .base import Base
+#from .base import Base
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 from datetime import datetime, timezone, timedelta
@@ -24,4 +24,3 @@ class Сart(Base):
                                             nullable=False)
     price: Mapped[int] = mapped_column(nullable=False, gt=0)
     quantity: Mapped[str] = mapped_column(default=1, gt=0)
-    
