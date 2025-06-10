@@ -1,6 +1,7 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pathlib import Path
 import os
+import sys
 
 # Конфигурация приложения
 # Константы должны быть прописаны в Файле .env
@@ -8,8 +9,6 @@ import os
 BASE_DIR = Path(__file__)
 
 class Setting(BaseSettings):
-    # версия api
-    api_prefix: str = "/api/v1"
 
     DB_HOST: str
     DB_PORT: int
@@ -24,6 +23,8 @@ class Setting(BaseSettings):
     #db_url: str = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
 
     SECRET_KEY: str
+    ACCESS_TOKEN_EXPIRE_MINUTES: int
+    FRESH_TOKEN_EXPIRE_MINUTES: int
    
     # Алгоритм шифрования токена
     ALGORITHM: str
@@ -42,12 +43,24 @@ class Setting(BaseSettings):
     def role(self):
         return tuple(self.ROLES.split(","))
     
-    @property  
-    def db_url(self):  
-        return (
-            f"postgresql+asyncpg://"
-            f"{self.DB_USER}:{self.DB_PASSWORD}"
-            f"@{self.DB_HOST}/{self.DB_NAME}"
-        ) 
+    @property 
+    def api_prefix(self):
+        # версия api
+        return "/api/v1"
     
-setting = Setting()
+    @property  
+    def db_url(self): 
+        if "main:app" in sys.argv:
+            return (
+                f"postgresql+asyncpg://"
+                f"{self.DB_USER}:{self.DB_PASSWORD}"
+                f"@{self.DB_HOST}/{self.DB_NAME}"
+                )
+        else:
+            return (
+                f"postgresql+asyncpg://"
+                f"{self.DB_USER}:{self.DB_PASSWORD}"
+                f"@{self.DB_HOST}/test_shop"
+                )
+    
+setting = Setting() # type: ignore
