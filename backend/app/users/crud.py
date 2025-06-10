@@ -7,7 +7,7 @@ from sqlalchemy.engine import Result
 from fastapi.responses import JSONResponse
 from app.users.security import get_password_hash, get_current_user
 from app.core.models import db_helper, User as UserDB
-from app.users.schemas import LoginUser, UserGet
+from app.users.schemas import LoginUser, UserGet, UserCreate
 from config import setting
 
 async def get_users(session: AsyncSession) -> list[UserDB]:
@@ -24,20 +24,20 @@ async def get_users(session: AsyncSession) -> list[UserDB]:
     )
 
 
-async def get_user_current(session: AsyncSession,
+'''async def get_user_current(session: AsyncSession,
                            current_user: UserGet 
-                           ):
+                           )  -> UserDB:
     """
     Выводит текущего пользователя
     """
     #stmt=select(User)
     #result: Result = await session.execute(stmt)
     #users = result.scalars().all()
-    if UserGet is not None:
+    if current_user is not None:
         return UserGet
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND
-    )
+    )'''
 
 
 async def get_user(user_id, session: AsyncSession) -> UserDB:
@@ -52,7 +52,7 @@ async def get_user(user_id, session: AsyncSession) -> UserDB:
     )
 
 
-async def create_user(user_in, session: AsyncSession):
+async def create_user(user_in: UserCreate, session: AsyncSession) -> UserDB | JSONResponse:
     """
     Создает нового пользователя
     """

@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from fastapi.responses import JSONResponse
-from .security import verify_password, create_jwt_token, get_user_from_token
+from .security import verify_password, create_jwt_token, get_user_from_token_refresh,get_user_from_token
 from app.core.models import User as UserDB
 from config import setting
 from fastapi import Depends, HTTPException, status
@@ -42,11 +42,21 @@ async def login_user(user_in, session: AsyncSession):
         content={"detail": "Error in login-password pair"}, status_code=401
     )
 
+from fastapi.security import OAuth2PasswordBearer
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
-async def refresh_token(user_id: int = Depends(get_user_from_token)):
+def refresh_token(current_userid: int):
 
     # Проверяем токен и извлекаем утверждение о пользователе.
-
-    return JSONResponse(
-        content={"detail": f" {user_id}"}, status_code=401
-    )
+    # Создаем новую пару токенов
+    token = create_jwt_token(
+                {"sub": str(current_userid)}, setting.ACCESS_TOKEN_EXPIRE_MINUTES
+            )  # "sub" — это subject, в нашем случае имя пользователя
+    token_refresh = create_jwt_token(
+                {"iss": str(current_userid)}, setting.FRESH_TOKEN_EXPIRE_MINUTES
+            )
+    return {
+                "access_token": token,
+                "token_type": "bearer",
+                "refresh_token": token_refresh,
+            } 

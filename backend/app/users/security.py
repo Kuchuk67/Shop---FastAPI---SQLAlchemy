@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from passlib.context import CryptContext
 from app.core.models import db_helper
 from app.core.models.users import User as UserDB
-
+import asyncio
 """
 Здесь функции хеширования паролей,
 создания и расшифровки токенов,
@@ -57,23 +57,23 @@ def create_jwt_token(data: Dict, expires_delta: int):
 
 
 # Функция для получения пользователя из токена
-def get_user_from_token(token: str = Depends(oauth2_scheme),
-                        refresh: bool = False
+async def get_user_from_token(token: str = Depends(oauth2_scheme)
                         ) -> int | None:
     """
     Функция для извлечения информации о пользователе из токена.
     Проверяем токен и извлекаем утверждение о пользователе.
     """
-    print("\n\n\n\n\n\n\n**************\n\n\n\n\n", token)
-
-    payload = jwt.decode(token, setting.SECRET_KEY, algorithms=[setting.ALGORITHM])
     try:
         payload = jwt.decode(token, setting.SECRET_KEY, algorithms=[setting.ALGORITHM])
         # Декодируем токен с помощью секретного ключа
         
     # Возвращаем утверждение о пользователе (subject) из полезной нагрузки
     except jwt.ExpiredSignatureError:
-        pass  # Обработка ошибки истечения срока действия токена
+        # Обработка ошибки истечения срока действия токена
+        raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Истечение срока действия токена"
+            )
     except jwt.InvalidTokenError:
         raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -81,10 +81,7 @@ def get_user_from_token(token: str = Depends(oauth2_scheme),
             )
     else:
         try:
-            if refresh:
-                user_id: int = int(payload.get("iss"))
-            else:
-                user_id: int = int(payload.get("sub"))
+            user_id: int = int(payload.get("sub"))
         except:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -92,8 +89,40 @@ def get_user_from_token(token: str = Depends(oauth2_scheme),
             )
         else:
             return user_id
-    
-    
+        
+        
+async def get_user_from_token_refresh(token: str = Depends(oauth2_scheme)
+                        ) -> int | None:
+    """
+    Функция для извлечения информации о пользователе из РЕФРЕШ-токена.
+    """
+    try:
+        payload = jwt.decode(token, setting.SECRET_KEY, algorithms=[setting.ALGORITHM])
+        # Декодируем токен с помощью секретного ключа
+        
+    # Возвращаем утверждение о пользователе (subject) из полезной нагрузки
+    except jwt.ExpiredSignatureError:
+        # Обработка ошибки истечения срока действия токена
+        raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Истечение срока действия токена"
+            )
+    except jwt.InvalidTokenError:
+        raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Token is invalid"
+            )
+    else:
+        try:
+            user_id: int = int(payload.get("iss"))
+        except:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="User not found"
+            )
+        else:
+            return user_id
+        
 
 async def get_user(user_id: int, session: AsyncSession) -> UserDB:
     """

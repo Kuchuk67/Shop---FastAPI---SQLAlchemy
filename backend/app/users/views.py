@@ -1,7 +1,15 @@
 from fastapi import APIRouter, Depends, Request
 from app.users import crud, authorization
-from app.users.schemas import LoginUser, UserGet, UserCreate, UserPatch
-from app.users.security import get_password_hash, get_current_user
+from app.users.schemas import (LoginUser, 
+                               UserGet, 
+                               UserCreate, 
+                               UserPatch
+                               )
+from app.users.security import (get_password_hash,
+                                get_current_user, 
+                                get_user_from_token_refresh,
+                                get_user_from_token
+                                )
 from sqlalchemy.ext.asyncio import AsyncSession
 from config import setting
 from app.core.models import db_helper, User as UserDB
@@ -28,8 +36,8 @@ async def get_users_list(
 @router.get("/", response_model=list[UserGet])
 @PermissionRole(["admin", "user"])
 async def get_users(
-    current_user: UserGet = Depends(get_current_user)
-):
+                current_user: UserGet = Depends(get_current_user)
+                ):
     """
     Выводит данные текущего пользователя
     """
@@ -85,19 +93,6 @@ async def user_delete(
     """
     return await crud.user_delete(user_id, session=session)
 
-'''
-@router.patch("/id-{user_id}/role/{role}/", response_model=UserGet)
-#@PermissionRole(["admin"])
-async def user_role(
-    user_id: int, 
-    role: str,
-    session: AsyncSession = Depends(db_helper.session_dependency)
-):
-    """
-    меняет роль  пользователя
-    """
-    return await crud.user_roles(user_id, role, session=session)'''
-
 
 @router_authentication.post("/registration/", status_code=201)
 async def create_user(
@@ -125,11 +120,9 @@ async def login_user(
 
 
 @router_authentication.post("/refresh-token/")
-async def refresh_token(session: AsyncSession = Depends(db_helper.session_dependency)
-):
+async def refresh_token(current_user_id: int = Depends(get_user_from_token_refresh)):
     """
-    проверяет учетные данные пользователя
-    и возвращает JWT токен, если данные правильные.\n
-    login: email пользователя или телефон +7..........
+    возвращает новую пару JWT, 
     """
-    return await authorization.refresh_token()
+    
+    return authorization.refresh_token(current_user_id)

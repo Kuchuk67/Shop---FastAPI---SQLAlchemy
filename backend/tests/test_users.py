@@ -23,6 +23,7 @@ async def test_user_1():
                         transport=ASGITransport(app=app),
                         base_url="http://localhost:8000"
                         ) as ac:
+        print(type(ac))
         response = await ac.get("/api/v1/users/id-1/")
         assert response.status_code == 401
 
@@ -39,9 +40,12 @@ async def client():
                         ) as ac:
         yield ac
 
-
+@pytest.mark.asyncio
 async def test_user_2(client):
-
+        print(type(client))
+        
         response = await client.get("/api/v1/users/id-1/")
         assert response.status_code == 401
+        client.close()
+            
 
