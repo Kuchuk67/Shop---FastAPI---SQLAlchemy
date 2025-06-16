@@ -39,11 +39,13 @@ async def test_auth():
     async with AsyncClient(
             transport=ASGITransport(app=app), base_url="http://localhost:8000"
     ) as ac, lifespan(app):
-        response = await ac.get("/api/v1/products/id-1/")
+        response = await ac.get("/api/v1/cart/")
         assert response.status_code == 401
-        response = await ac.patch("/api/v1/products/id-1/")
+        response = await ac.post("/api/v1/cart/add/")
         assert response.status_code == 401
-        response = await ac.post("/api/v1/products/add/")
+        response = await ac.patch("/api/v1/cart/")
+        assert response.status_code == 401
+        response = await ac.post("/api/v1/cart/remove_all/")
         assert response.status_code == 401
 
 
@@ -70,7 +72,7 @@ async def test_create_admin(session: AsyncSession = Depends(db_helper.session_de
 @pytest_asyncio.fixture
 async def token_auth_admin():
     """
-    фикстура получает токен доступа 
+    фикстура получает токен доступа
     для user для создания заголовка
     """
     async with AsyncClient(
@@ -110,35 +112,7 @@ async def test_product_add(token_auth_admin):
             assert response.status_code == 201
 
 
-async def test_products(token_auth_admin):
-    """
-    вывод списка товаров
-    """
-    header = {"Authorization": f"Bearer {await token_auth_admin}"}
-    async with AsyncClient(
-            transport=ASGITransport(app=app),
-            base_url="http://localhost:8000"
-    ) as ac:
-        response = await ac.get("/api/v1/products/?page=0&limit=5", headers=header)
-        assert response.status_code == 200
-        data = json.loads(response.content)
-        assert len(data) == 5
-
-
-async def test_products_id(token_auth_admin):
-    """
-    вывод списка товаров
-    """
-    header = {"Authorization": f"Bearer {await token_auth_admin}"}
-    async with AsyncClient(
-            transport=ASGITransport(app=app),
-            base_url="http://localhost:8000"
-    ) as ac:
-        response = await ac.get("/api/v1/products/id-1/", headers=header)
-        assert response.status_code == 200
-
-
-async def test_products_patch(token_auth_admin):
+async def test_cart_add(token_auth_admin):
     """
     вывод списка товаров
     """
@@ -148,19 +122,18 @@ async def test_products_patch(token_auth_admin):
             base_url="http://localhost:8000"
     ) as ac:
         data = {
-            "quantity": 100,
-            "is_active": False,
-            "price": 100
+            "quantity": 10,
+            "product_id": 3
         }
-        response = await ac.patch("/api/v1/products/id-1/", json=data, headers=header)
-        assert response.status_code == 200
-        data = json.loads(response.content)
-        assert data["price"] == 100
-        assert data["is_active"] == False
-        assert data["quantity"] == 100
+        response = await ac.post("/api/v1/cart/add/",
+                                 json=data,
+                                 headers=header)
+        assert response.status_code == 422
+        assert response.content.decode(
+            "utf-8") == '{"detail":"Столько товара нет в наличии"}'
 
 
-async def test_products_delete(token_auth_admin):
+async def test_cart_add2(token_auth_admin):
     """
     вывод списка товаров
     """
@@ -169,9 +142,82 @@ async def test_products_delete(token_auth_admin):
             transport=ASGITransport(app=app),
             base_url="http://localhost:8000"
     ) as ac:
-        response = await ac.patch("/api/v1/products/id-1/delete/", headers=header)
+        data = {
+            "quantity": 2,
+            "product_id": 5
+        }
+        response = await ac.post("/api/v1/cart/add/",
+                                 json=data,
+                                 headers=header)
+        assert response.status_code == 201
+
+
+async def test_cart_add3(token_auth_admin):
+    """
+    вывод списка товаров
+    """
+    header = {"Authorization": f"Bearer {await token_auth_admin}"}
+    async with AsyncClient(
+            transport=ASGITransport(app=app),
+            base_url="http://localhost:8000"
+    ) as ac:
+        data = {
+            "quantity": 8,
+            "product_id": 12
+        }
+        response = await ac.post("/api/v1/cart/add/",
+                                 json=data,
+                                 headers=header)
+        assert response.status_code == 201
+
+
+async def test_cart_patch(token_auth_admin):
+    """
+    вывод списка товаров
+    """
+    header = {"Authorization": f"Bearer {await token_auth_admin}"}
+    async with AsyncClient(
+            transport=ASGITransport(app=app),
+            base_url="http://localhost:8000"
+    ) as ac:
+        data = {
+            "quantity": 3,
+            "product_id": 12
+        }
+        response = await ac.patch("/api/v1/cart/",
+                                  json=data,
+                                  headers=header)
         assert response.status_code == 200
-        response = await ac.get("/api/v1/products/?page=0&limit=100", headers=header)
+
+
+async def test_cart(token_auth_admin):
+    """
+    вывод списка товаров
+    """
+    header = {"Authorization": f"Bearer {await token_auth_admin}"}
+    async with AsyncClient(
+            transport=ASGITransport(app=app),
+            base_url="http://localhost:8000"
+    ) as ac:
+        response = await ac.get("/api/v1/cart/",
+                                headers=header)
         assert response.status_code == 200
-        data = json.loads(response.content)
-        assert len(data) == 14
+        data = [{"quantity": 2, "product_id": 5, "user_id": 1, "price": 5000, "id": 1},
+                {"quantity": 3, "product_id": 12, "user_id": 1, "price": 12000, "id": 2}]
+        result = response.content.decode('utf-8')
+        assert json.loads(result) == data
+
+
+
+async def test_cart_del(token_auth_admin):
+    """
+    Очистка корзины
+    """
+    header = {"Authorization": f"Bearer {await token_auth_admin.do_something()}"}
+    async with AsyncClient(
+            transport=ASGITransport(app=app),
+            base_url="http://localhost:8000"
+    ) as ac:
+        response = await ac.post("/api/v1/cart/remove_all/",
+                                 headers=header)
+        assert response.status_code == 200
