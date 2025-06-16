@@ -1,14 +1,13 @@
-from fastapi import APIRouter, Depends, Request
-from app.shopcase.schemas import ProductShopGet, ProductShop, CartBase, CartGet, CartPatch, ProductShopPut
+from fastapi import APIRouter, Depends
+from app.shopcase.schemas import ProductShopGet, ProductShop, CartBase, CartGet, ProductShopPut
 from app.users.schemas import UserGet
 from app.shopcase import crud_shop, crud_cart
-from app.users.security import get_password_hash, get_current_user
+from app.users.security import get_current_user
 from sqlalchemy.ext.asyncio import AsyncSession
 from config import setting
 from app.core.models import db_helper
 from app.core.models.shop import ProductShop as ProductShopDB, Cart as CartDB
 from app.users.rbac import PermissionRole
-from fastapi.responses import JSONResponse
 
 # Добавляем префикс
 router_shop = APIRouter(prefix=f"{setting.api_prefix}/products", tags=["Product"])
@@ -16,12 +15,10 @@ router_cart = APIRouter(prefix=f"{setting.api_prefix}/cart", tags=["Cart"])
 
 
 @router_shop.get("/", response_model=list[ProductShopGet])
-#@PermissionRole(["user"])
 async def products_get_list(
         page: int = 1, limit: int = 10,
         session: AsyncSession = Depends(db_helper.session_dependency),
-        #current_user: UserGet = Depends(get_current_user)
-        ) -> list[ProductShopDB]:
+) -> list[ProductShopDB]:
     """
     Выводит список товаров
     """
@@ -34,11 +31,11 @@ async def products_list(
         product_id: int,
         session: AsyncSession = Depends(db_helper.session_dependency),
         current_user: UserGet = Depends(get_current_user)
-        ) -> ProductShopDB:
+) -> ProductShopDB:
     """
     Выводит один продукт по ID
     """
-    return await crud_shop.products_get(session=session, 
+    return await crud_shop.products_get(session=session,
                                         id=product_id)
 
 
@@ -48,11 +45,11 @@ async def products_add(
         product_in: ProductShop,
         session: AsyncSession = Depends(db_helper.session_dependency),
         current_user: UserGet = Depends(get_current_user)
-        ) ->  ProductShopGet:
+) -> ProductShopGet:
     """
     Добавляет продукт
     """
-    return await crud_shop.products_add(session=session, 
+    return await crud_shop.products_add(session=session,
                                         product_in=product_in
                                         )
 
@@ -64,13 +61,13 @@ async def products_edit(
         product_in: ProductShopPut,
         session: AsyncSession = Depends(db_helper.session_dependency),
         current_user: UserGet = Depends(get_current_user)
-        ) -> ProductShopDB | None:
+) -> ProductShopDB | None:
     """
     Редактирует продукт
     """
-    return await crud_shop.products_edit(session=session, 
-                                        product_id=product_id,
-                                        product_in=product_in)
+    return await crud_shop.products_edit(session=session,
+                                         product_id=product_id,
+                                         product_in=product_in)
 
 
 @router_shop.patch("/id-{product_id}/delete/", response_model=ProductShopGet)
@@ -79,11 +76,11 @@ async def products_delete(
         product_id: int,
         session: AsyncSession = Depends(db_helper.session_dependency),
         current_user: UserGet = Depends(get_current_user)
-        ) -> ProductShopDB:
+) -> ProductShopDB:
     """
     Удаляет продукт (обнуляет количество)
     """
-    return await crud_shop.products_delete(session=session, 
+    return await crud_shop.products_delete(session=session,
                                            product_id=product_id)
 
 
@@ -94,11 +91,11 @@ async def products_delete(
 async def cart_get_list(
         session: AsyncSession = Depends(db_helper.session_dependency),
         current_user: UserGet = Depends(get_current_user)
-        ) -> list[CartDB]:
+) -> list[CartDB]:
     """
     Выводит товары в корзине
     """
-    return await crud_cart.cart_get_list(session=session, 
+    return await crud_cart.cart_get_list(session=session,
                                          current_user=current_user)
 
 
@@ -108,29 +105,14 @@ async def cart_add(
         product_in: CartBase,
         session: AsyncSession = Depends(db_helper.session_dependency),
         current_user: UserGet = Depends(get_current_user)
-        ):
+):
     """
     Добавляет товар в корзину
     """
     return await crud_cart.cart_add(session=session,
-                                        current_user=current_user,
-                                        product_in=product_in,
-                                        )
-
-
-'''@router_cart.post("/id-{cart_id}/delete", response_model=list[CartGet])
-#@PermissionRole(["user"])
-async def cart_gelete(
-        cart_id: int,
-        session: AsyncSession = Depends(db_helper.session_dependency),
-        current_user: UserGet = Depends(get_current_user)
-        ):
-    """
-    Удаляет товар из корзины
-    """
-    return await crud_cart.cart_gelete(session=session, 
-                                       current_user=current_user, 
-                                       cart_id=cart_id)'''
+                                    current_user=current_user,
+                                    product_in=product_in,
+                                    )
 
 
 @router_cart.patch("/patch/", response_model=CartGet)
@@ -139,16 +121,15 @@ async def cart_patch_quantity(
         product_in: CartBase,
         session: AsyncSession = Depends(db_helper.session_dependency),
         current_user: UserGet = Depends(get_current_user)
-        ) -> CartDB | None:
+) -> CartDB | None:
     """
     Изменяет количество товара в корзине
     """
-    
 
-    return await crud_cart.cart_patch_quantity(session=session,                                        
-                                        current_user=current_user,
-                                        product_in=product_in,
-                                        )
+    return await crud_cart.cart_patch_quantity(session=session,
+                                               current_user=current_user,
+                                               product_in=product_in,
+                                               )
 
 
 @router_cart.post("/add/remove_all/", response_model=list[CartGet])
@@ -156,10 +137,10 @@ async def cart_patch_quantity(
 async def cart_remove_all(
         session: AsyncSession = Depends(db_helper.session_dependency),
         current_user: UserGet = Depends(get_current_user)
-        ):
+):
     """
     Очищает корзину
     """
     return await crud_cart.cart_remove_all(session=session,
-                                        current_user=current_user,
-                                        )
+                                           current_user=current_user,
+                                           )

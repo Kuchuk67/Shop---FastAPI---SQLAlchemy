@@ -1,0 +1,20 @@
+
+    # Подключение БД
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=shop
+DB_USER=postgres
+DB_PASSWORD=54321
+
+DEBAG=True
+
+    # JWT
+SECRET_KEY=
+ACCESS_TOKEN_EXPIRE_MINUTES=15
+FRESH_TOKEN_EXPIRE_MINUTES=1080
+
+    # Алгоритм шифрования токена
+ALGORITHM=HS256
+
+    # Список ролей пользователей
+ROLES=admin,user

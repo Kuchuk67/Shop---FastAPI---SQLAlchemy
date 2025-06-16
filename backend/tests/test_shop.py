@@ -1,27 +1,19 @@
 import json
-from random import random
-
 import pytest
 import pytest_asyncio
-from typing import Any, AsyncGenerator
 from httpx import ASGITransport, AsyncClient
-from asgi_lifespan import LifespanManager
 from main import app
-from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends
 from app.core.models import db_helper, User as UserDB
 from app.core.models import Base
-import asyncio
 from contextlib import asynccontextmanager
-from ast import literal_eval 
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from .fixture import users_all, users_one, users_one_2, users_one_3, users_products
 
 
 async def override_get_async_session():
     async with db_helper.session_factory() as session:
         yield session
+
 
 pytestmark = pytest.mark.asyncio(loop_scope="session")
 
@@ -75,8 +67,6 @@ async def test_create_admin(session: AsyncSession = Depends(db_helper.session_de
             await session.commit()
 
 
-
-
 @pytest_asyncio.fixture
 async def token_auth_admin():
     """
@@ -84,17 +74,18 @@ async def token_auth_admin():
     для user для создания заголовка
     """
     async with AsyncClient(
-                        transport=ASGITransport(app=app),
-                        base_url="http://localhost:8000"
-                        ) as ac:
+            transport=ASGITransport(app=app),
+            base_url="http://localhost:8000"
+    ) as ac:
         login_data = {
-        "login": "admin@example.com",
-        "password": "pSSdsd343#ads"
-    }
+            "login": "admin@example.com",
+            "password": "pSSdsd343#ads"
+        }
         response = await ac.post("/api/v1/login/", json=login_data)
         assert response.status_code == 200
     token = response.json()["access_token"]
     return token
+
 
 async def test_product_add(token_auth_admin):
     """
@@ -102,34 +93,32 @@ async def test_product_add(token_auth_admin):
     """
 
     header = {"Authorization": f"Bearer {await token_auth_admin}"}
-    #rex = f"{await users_products}"
+    # rex = f"{await users_products}"
     async with AsyncClient(
-                        transport=ASGITransport(app=app),
-                        base_url="http://localhost:8000"
-                        ) as ac:
-        for x in range(1,15):
-
-
+            transport=ASGITransport(app=app),
+            base_url="http://localhost:8000"
+    ) as ac:
+        for x in range(1, 15):
             prod_data = {
                 "name": f"Товар {x}",
                 "description": f"Описание: {x}, подробное описание товара и его свойств",
-                "price": x*1000,
+                "price": x * 1000,
                 "quantity": x,
                 "is_active": True
             }
             response = await ac.post("/api/v1/products/add/", json=prod_data, headers=header)
             assert response.status_code == 201
 
-       
+
 async def test_products(token_auth_admin):
     """
     вывод списка товаров
     """
     header = {"Authorization": f"Bearer {await token_auth_admin}"}
     async with AsyncClient(
-                        transport=ASGITransport(app=app),
-                        base_url="http://localhost:8000"
-                        ) as ac:
+            transport=ASGITransport(app=app),
+            base_url="http://localhost:8000"
+    ) as ac:
         response = await ac.get("/api/v1/products/?page=0&limit=5", headers=header)
         assert response.status_code == 200
         data = json.loads(response.content)
@@ -142,9 +131,9 @@ async def test_products_id(token_auth_admin):
     """
     header = {"Authorization": f"Bearer {await token_auth_admin}"}
     async with AsyncClient(
-                        transport=ASGITransport(app=app),
-                        base_url="http://localhost:8000"
-                        ) as ac:
+            transport=ASGITransport(app=app),
+            base_url="http://localhost:8000"
+    ) as ac:
         response = await ac.get("/api/v1/products/id-1/", headers=header)
         assert response.status_code == 200
 
@@ -155,14 +144,14 @@ async def test_products_patch(token_auth_admin):
     """
     header = {"Authorization": f"Bearer {await token_auth_admin}"}
     async with AsyncClient(
-                        transport=ASGITransport(app=app),
-                        base_url="http://localhost:8000"
-                        ) as ac:
-        data={
-              "quantity": 100,
-              "is_active": False,
-              "price": 100
-                }
+            transport=ASGITransport(app=app),
+            base_url="http://localhost:8000"
+    ) as ac:
+        data = {
+            "quantity": 100,
+            "is_active": False,
+            "price": 100
+        }
         response = await ac.patch("/api/v1/products/id-1/", json=data, headers=header)
         assert response.status_code == 200
         data = json.loads(response.content)
@@ -177,13 +166,12 @@ async def test_products_delete(token_auth_admin):
     """
     header = {"Authorization": f"Bearer {await token_auth_admin}"}
     async with AsyncClient(
-                        transport=ASGITransport(app=app),
-                        base_url="http://localhost:8000"
-                        ) as ac:
+            transport=ASGITransport(app=app),
+            base_url="http://localhost:8000"
+    ) as ac:
         response = await ac.patch("/api/v1/products/id-1/delete/", headers=header)
         assert response.status_code == 200
         response = await ac.get("/api/v1/products/?page=0&limit=100", headers=header)
         assert response.status_code == 200
         data = json.loads(response.content)
         assert len(data) == 14
-

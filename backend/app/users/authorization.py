@@ -4,8 +4,8 @@ from fastapi.responses import JSONResponse
 from .security import verify_password, create_jwt_token, get_user_from_token
 from app.core.models import User as UserDB
 from config import setting
-from fastapi import Depends, HTTPException, status
-import jwt
+from fastapi import Depends
+
 
 async def login_user(user_in, session: AsyncSession):
     """
@@ -44,7 +44,6 @@ async def login_user(user_in, session: AsyncSession):
 
 
 async def refresh_token(user_id: int = Depends(get_user_from_token)):
-
     # Проверяем токен и извлекаем утверждение о пользователе.
 
     return JSONResponse(

@@ -2,7 +2,6 @@ from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime, timezone, timedelta
 
 
-
 class ProductShop(BaseModel):
     """
     Описывает базовую модель
@@ -13,7 +12,6 @@ class ProductShop(BaseModel):
     price: int = Field(default=0, ge=0)
     quantity: int = Field(default=0, ge=0)
     is_active: bool = True
-
 
 
 class ProductShopGet(ProductShop):
@@ -43,6 +41,7 @@ class CartBase(BaseModel):
     quantity: int = Field(gt=0)
     product_id: int = Field(gt=0)
 
+
 class Cart(CartBase):
     """
     Описывает базовую модель
@@ -50,7 +49,6 @@ class Cart(CartBase):
 
     user_id: int = Field(gt=0)
     price: int = Field(gt=0)
-
 
 
 class CartGet(Cart):
