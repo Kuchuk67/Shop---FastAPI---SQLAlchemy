@@ -14,7 +14,7 @@ router_authentication = APIRouter(prefix=f"{setting.api_prefix}", tags=["Users_A
 
 
 @router.get("/list/", response_model=list[UserGet])
-@PermissionRole(["user"])
+@PermissionRole(["admin"])
 async def get_users_list(
     session: AsyncSession = Depends(db_helper.session_dependency),
     current_user: UserGet = Depends(get_current_user)
@@ -39,14 +39,14 @@ async def get_users(
                      "email": current_user.email,
                      "phone": current_user.phone,
                      "roles": current_user.roles,
-                     
+   
                      },
             status_code=200
         )
 
 
 @router.get("/id-{user_id}/", response_model=UserGet)
-@PermissionRole(["admin", "user"])
+@PermissionRole(["admin"])
 async def get_user(
     user_id: int, session: AsyncSession = Depends(db_helper.session_dependency),
     current_user: UserGet = Depends(get_current_user)
