@@ -15,7 +15,7 @@ async def products_get_list(session: AsyncSession, page, limit) -> list[ProductS
     """
     count = await session.execute(text("SELECT COUNT(*) FROM productshops"))
     count = count.scalars().one()
-
+    if page <=0: page = 1
     offset = (page-1) * limit
 
     if count % limit == 0:

@@ -29,11 +29,11 @@ async def products_get_list(
 
 
 @router_shop.get("/id-{product_id}/", response_model=ProductShopGet)
-#@PermissionRole(["user"])
+@PermissionRole(["user"])
 async def products_list(
         product_id: int,
         session: AsyncSession = Depends(db_helper.session_dependency),
-        #current_user: UserGet = Depends(get_current_user)
+        current_user: UserGet = Depends(get_current_user)
         ) -> ProductShopDB:
     """
     Выводит один продукт по ID
@@ -43,11 +43,11 @@ async def products_list(
 
 
 @router_shop.post("/add/", status_code=201)
-#@PermissionRole(["admin"])
+@PermissionRole(["admin"])
 async def products_add(
         product_in: ProductShop,
         session: AsyncSession = Depends(db_helper.session_dependency),
-        #current_user: UserGet = Depends(get_current_user)
+        current_user: UserGet = Depends(get_current_user)
         ) ->  ProductShopGet:
     """
     Добавляет продукт
@@ -58,12 +58,12 @@ async def products_add(
 
 
 @router_shop.patch("/id-{product_id}/", response_model=ProductShopGet)
-#@PermissionRole(["user"])
+@PermissionRole(["user"])
 async def products_edit(
         product_id: int,
         product_in: ProductShopPut,
         session: AsyncSession = Depends(db_helper.session_dependency),
-        #current_user: UserGet = Depends(get_current_user)
+        current_user: UserGet = Depends(get_current_user)
         ) -> ProductShopDB | None:
     """
     Редактирует продукт
@@ -74,11 +74,11 @@ async def products_edit(
 
 
 @router_shop.patch("/id-{product_id}/delete/", response_model=ProductShopGet)
-#@PermissionRole(["admin"])
+@PermissionRole(["admin"])
 async def products_delete(
         product_id: int,
         session: AsyncSession = Depends(db_helper.session_dependency),
-        #current_user: UserGet = Depends(get_current_user)
+        current_user: UserGet = Depends(get_current_user)
         ) -> ProductShopDB:
     """
     Удаляет продукт (обнуляет количество)
@@ -90,7 +90,7 @@ async def products_delete(
 # Корзина router_cart /cart
 
 @router_cart.get("/", response_model=list[CartGet])
-#@PermissionRole(["user"])
+@PermissionRole(["user"])
 async def cart_get_list(
         session: AsyncSession = Depends(db_helper.session_dependency),
         current_user: UserGet = Depends(get_current_user)
@@ -103,7 +103,7 @@ async def cart_get_list(
 
 
 @router_cart.post("/add/", response_model=CartGet, status_code=201)
-#@PermissionRole(["user"])
+@PermissionRole(["user"])
 async def cart_add(
         product_in: CartBase,
         session: AsyncSession = Depends(db_helper.session_dependency),
@@ -134,7 +134,7 @@ async def cart_gelete(
 
 
 @router_cart.patch("/patch/", response_model=CartGet)
-#@PermissionRole(["user"])
+@PermissionRole(["user"])
 async def cart_patch_quantity(
         product_in: CartBase,
         session: AsyncSession = Depends(db_helper.session_dependency),
@@ -152,7 +152,7 @@ async def cart_patch_quantity(
 
 
 @router_cart.post("/add/remove_all/", response_model=list[CartGet])
-#@PermissionRole(["user"])
+@PermissionRole(["user"])
 async def cart_remove_all(
         session: AsyncSession = Depends(db_helper.session_dependency),
         current_user: UserGet = Depends(get_current_user)

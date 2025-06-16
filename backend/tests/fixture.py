@@ -32,6 +32,47 @@ def users_one_2():
 def users_one_3():
     return b'{"full_name":"string","email":"user@example.com","phone":"+79012345679","disabled":true,"roles":"admin","id":2}'
 
+pytestmark = pytest.mark.asyncio(loop_scope="session")
+async def override_get_async_session():
+    async with db_helper.session_factory() as session:
+        yield session
+
+@pytest.fixture
+async def users_products():
+    @asynccontextmanager
+    async def lifespan(app: FastAPI):
+        async with db_helper.engine.begin() as conn:
+            app.dependency_overrides[db_helper.scoped_session_dependency] = override_get_async_session
+            yield
+
+    async with AsyncClient(
+                        transport=ASGITransport(app=app),
+                        base_url="http://localhost:8000"
+                        ) as ac, lifespan(app):
+        login_data = {
+            "login": "admin@example.com",
+            "password": "pSSdsd343#ads"
+        }
+        response = await ac.post("/api/v1/login/", json=login_data)
+        assert response.status_code == 200
+        token = response.json()["access_token"]
+        header = {"Authorization": f"Bearer {token}"}
+
+
+        prod_data = {
+                  "name": "string",
+                  "description": "string",
+                  "price": 0,
+                  "quantity": 0,
+                  "is_active": True
+                }
+
+
+        response = await ac.post("/api/v1/products/add/", json=prod_data, headers=header)
+        assert response.status_code == 200
+        return prod_data
+
+
 
 @pytest_asyncio.fixture
 async def ttt():
@@ -49,3 +90,5 @@ async def ttt():
         assert response.status_code == 200
     token = response.json()["access_token"]
     return token
+
+

@@ -29,7 +29,7 @@ class PermissionRole:
 
             if (
                 user.roles not in self.roles
-            ):  # not any(role in user.roles for role in self.roles):
+            ) | user.disabled:  # not any(role in user.roles for role in self.roles):
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="Недостаточно прав для доступа",
