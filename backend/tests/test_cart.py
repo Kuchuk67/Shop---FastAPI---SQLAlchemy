@@ -213,7 +213,7 @@ async def test_cart_del(token_auth_admin):
     """
     Очистка корзины
     """
-    header = {"Authorization": f"Bearer {await token_auth_admin.do_something()}"}
+    header = {"Authorization": f"Bearer {await token_auth_admin}"}
     async with AsyncClient(
             transport=ASGITransport(app=app),
             base_url="http://localhost:8000"
