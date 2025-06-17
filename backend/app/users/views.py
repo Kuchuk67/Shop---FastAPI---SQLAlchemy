@@ -1,12 +1,13 @@
 from fastapi import APIRouter, Depends, Request
 from app.users import crud, authorization
 from app.users.schemas import LoginUser, UserGet, UserCreate, UserPatch
-from app.users.security import get_password_hash, get_current_user
+from app.users.security import get_password_hash, get_current_user, validate_pass
 from sqlalchemy.ext.asyncio import AsyncSession
 from config import setting
 from app.core.models import db_helper, User as UserDB
 from app.users.rbac import PermissionRole
 from fastapi.responses import JSONResponse
+import re
 
 # Добавляем префикс
 router = APIRouter(prefix=f"{setting.api_prefix}/users", tags=["Users"])
@@ -107,9 +108,15 @@ async def create_user(
     Принимем POST запрос на создание пользователя
     по схеме UserCreate
     """
-    user_in.password = get_password_hash(user_in.password)
-    # Передаем запрос в круд на создание пользователя
-    return await crud.create_user(user_in=user_in, session=session)
+    # Валидация пароля
+    if not validate_pass(user_in.password):
+        return JSONResponse(
+            content={"detail": "Пароль слишком простой"}, status_code=422
+        )
+    else:
+        user_in.password = get_password_hash(user_in.password)
+        # Передаем запрос в круд на создание пользователя
+        return await crud.create_user(user_in=user_in, session=session)
 
 
 @router_authentication.post("/login/")

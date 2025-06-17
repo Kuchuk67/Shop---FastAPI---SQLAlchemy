@@ -44,8 +44,9 @@ class UserCreate(UserBase):
     Модель для создания Пользователя
     """
 
-    password: str
-
+    password: str = Field(..., min_length=8)
+    # ^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).*$
+    # (?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$
 
 class LoginUser(BaseModel):
     """

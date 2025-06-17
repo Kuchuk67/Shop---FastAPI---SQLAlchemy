@@ -4,11 +4,11 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from typing import Dict
 from config import setting
-from .schemas import User, UserGet
 from sqlalchemy.ext.asyncio import AsyncSession
 from passlib.context import CryptContext
 from app.core.models import db_helper
 from app.core.models.users import User as UserDB
+import re
 
 """
 Здесь функции хеширования паролей,
@@ -17,6 +17,16 @@ from app.core.models.users import User as UserDB
 """
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def validate_pass(password: str) -> bool:
+    """
+    Проверка уровня сложности пароля
+    """
+    if re.fullmatch(r'(?=^.{8,}$)((?=.*\d)(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$', password):
+        return True
+    return False
+
+
 
 def get_password_hash(password: str) -> str:
     """

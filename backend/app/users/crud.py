@@ -52,6 +52,8 @@ async def create_user(user_in, session: AsyncSession):
     """
     Создает нового пользователя
     """
+
+
     # Нужна проверка на наличие похожих email и телефона в БД
     statement = select(UserDB).where(
         (UserDB.email == user_in.email) | (UserDB.phone == user_in.phone)
