@@ -53,7 +53,7 @@ async def test_registration():
                                      "full_name": "string",
                                      "email": "user@example.com",
                                      "phone": "+70349184258",
-                                     "password": "string"
+                                     "password": "pSdeWD343#ads"
                                  }
                                  )
         assert response.status_code == 201
@@ -69,7 +69,7 @@ async def test_user_login_email():
         response = await ac.post("/api/v1/login/",
                                  json={
                                      "login": "user@example.com",
-                                     "password": "string"
+                                     "password": "pSdeWD343#ads"
                                  }
                                  )
         assert literal_eval(response.content.decode('utf-8'))["token_type"] == "bearer"
@@ -85,7 +85,7 @@ async def test_user_login_phone():
         response = await ac.post("/api/v1/login/",
                                  json={
                                      "login": "+70349184258",
-                                     "password": "string"
+                                     "password": "pSdeWD343#ads"
                                  }
                                  )
         assert literal_eval(response.content.decode('utf-8'))["token_type"] == "bearer"
@@ -103,7 +103,7 @@ async def test_registration_not_email():
                                      "full_name": "string",
                                      "email": "user@examplecom",
                                      "phone": "+70349522211",
-                                     "password": "string"
+                                     "password": "pSdeWD343#ads"
                                  }
                                  )
         assert response.status_code == 422
@@ -116,30 +116,43 @@ async def test_registration_not_phone1():
     async with AsyncClient(
             transport=ASGITransport(app=app), base_url="http://localhost:8000"
     ) as ac:
+        # телефон без +
         response = await ac.post("/api/v1/registration/",
                                  json={
                                      "full_name": "string",
                                      "email": "user@example.com",
                                      "phone": "70349522211",
-                                     "password": "string"
+                                     "password": "pSdeWD343#ads"
                                  }
                                  )
         assert response.status_code == 422
+        # короткий телефон
         response = await ac.post("/api/v1/registration/",
                                  json={
                                      "full_name": "string",
                                      "email": "user@example.com",
                                      "phone": "+7900333221",
-                                     "password": "string"
+                                     "password": "pSdeWD343#ads"
                                  }
                                  )
         assert response.status_code == 422
+        # невалидный телефон
         response = await ac.post("/api/v1/registration/",
                                  json={
                                      "full_name": "string",
                                      "email": "user@example.com",
                                      "phone": "+7 900 333 2121",
-                                     "password": "string"
+                                     "password": "pSdeWD343#ads"
+                                 }
+                                 )
+        assert response.status_code == 422
+        # Короткий пароль
+        response = await ac.post("/api/v1/registration/",
+                                 json={
+                                     "full_name": "string",
+                                     "email": "user@example.com",
+                                     "phone": "+79003332121",
+                                     "password": "pSdeWDbbads"
                                  }
                                  )
         assert response.status_code == 422
@@ -157,7 +170,7 @@ async def test_duble_email():
                                      "full_name": "string",
                                      "email": "user@example.com",
                                      "phone": "+70349184251",
-                                     "password": "string"
+                                     "password": "pSdeWDbbads"
                                  }
                                  )
         assert response.status_code == 202
@@ -175,7 +188,7 @@ async def test_duble_phone():
                                      "full_name": "string",
                                      "email": "user1@example.com",
                                      "phone": "+70349184258",
-                                     "password": "string"
+                                     "password": "pSdeWDbbads"
                                  }
                                  )
         assert response.status_code == 202

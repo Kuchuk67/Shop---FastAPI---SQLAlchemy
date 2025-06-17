@@ -21,6 +21,9 @@ class Setting(BaseSettings):
     POSTGRES_PASSWORD: int
     POSTGRES_PORT: int
 
+    TEST_POSTGRES_HOST: str
+    TEST_POSTGRES_DB: str
+
     DEBAG: bool
 
     # url соединения с БД
@@ -65,7 +68,7 @@ class Setting(BaseSettings):
             return (
                 f"postgresql+asyncpg://"
                 f"{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
-                f"@{self.POSTGRES_HOST}/test_shop"
+                f"@{self.TEST_POSTGRES_HOST}/{self.TEST_POSTGRES_DB}"
             )
 
 

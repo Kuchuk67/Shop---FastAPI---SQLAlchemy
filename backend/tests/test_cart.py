@@ -9,7 +9,7 @@ from app.core.models import Base
 from contextlib import asynccontextmanager
 from sqlalchemy.ext.asyncio import AsyncSession
 
-
+@pytest.mark.asyncio(loop_scope="session")
 async def override_get_async_session():
     async with db_helper.session_factory() as session:
         yield session
@@ -18,6 +18,7 @@ async def override_get_async_session():
 pytestmark = pytest.mark.asyncio(loop_scope="session")
 
 
+@pytest.mark.asyncio(loop_scope="session")
 async def test_auth():
     """
     очистка БД и новое создание таблиц
@@ -49,6 +50,7 @@ async def test_auth():
         assert response.status_code == 401
 
 
+@pytest.mark.asyncio(loop_scope="session")
 async def test_create_admin(session: AsyncSession = Depends(db_helper.session_dependency)):
     """ Создание пользователя admin"""
     async with AsyncClient(
@@ -59,7 +61,7 @@ async def test_create_admin(session: AsyncSession = Depends(db_helper.session_de
                                      "full_name": "administrator",
                                      "email": "admin@example.com",
                                      "phone": "+79012345678",
-                                     "password": "pSSdsd343#ads"
+                                     "password": "pSdeWD343#ads"
                                  })
         assert response.status_code == 201
         async_session = db_helper.session_factory
@@ -69,7 +71,7 @@ async def test_create_admin(session: AsyncSession = Depends(db_helper.session_de
             await session.commit()
 
 
-@pytest_asyncio.fixture
+@pytest_asyncio.fixture(loop_scope="session")
 async def token_auth_admin():
     """
     фикстура получает токен доступа
@@ -81,7 +83,7 @@ async def token_auth_admin():
     ) as ac:
         login_data = {
             "login": "admin@example.com",
-            "password": "pSSdsd343#ads"
+            "password": "pSdeWD343#ads"
         }
         response = await ac.post("/api/v1/login/", json=login_data)
         assert response.status_code == 200
@@ -89,12 +91,13 @@ async def token_auth_admin():
     return token
 
 
+@pytest.mark.asyncio(loop_scope="session")
 async def test_product_add(token_auth_admin):
     """
     вывод текущего пользователя
     """
 
-    header = {"Authorization": f"Bearer {await token_auth_admin}"}
+    header = {"Authorization": f"Bearer {token_auth_admin}"}
     # rex = f"{await users_products}"
     async with AsyncClient(
             transport=ASGITransport(app=app),
@@ -112,11 +115,12 @@ async def test_product_add(token_auth_admin):
             assert response.status_code == 201
 
 
+@pytest.mark.asyncio(loop_scope="session")
 async def test_cart_add(token_auth_admin):
     """
     вывод списка товаров
     """
-    header = {"Authorization": f"Bearer {await token_auth_admin}"}
+    header = {"Authorization": f"Bearer {token_auth_admin}"}
     async with AsyncClient(
             transport=ASGITransport(app=app),
             base_url="http://localhost:8000"
@@ -133,11 +137,12 @@ async def test_cart_add(token_auth_admin):
             "utf-8") == '{"detail":"Столько товара нет в наличии"}'
 
 
+@pytest.mark.asyncio(loop_scope="session")
 async def test_cart_add2(token_auth_admin):
     """
     вывод списка товаров
     """
-    header = {"Authorization": f"Bearer {await token_auth_admin}"}
+    header = {"Authorization": f"Bearer {token_auth_admin}"}
     async with AsyncClient(
             transport=ASGITransport(app=app),
             base_url="http://localhost:8000"
@@ -152,11 +157,12 @@ async def test_cart_add2(token_auth_admin):
         assert response.status_code == 201
 
 
+@pytest.mark.asyncio(loop_scope="session")
 async def test_cart_add3(token_auth_admin):
     """
     вывод списка товаров
     """
-    header = {"Authorization": f"Bearer {await token_auth_admin}"}
+    header = {"Authorization": f"Bearer {token_auth_admin}"}
     async with AsyncClient(
             transport=ASGITransport(app=app),
             base_url="http://localhost:8000"
@@ -171,11 +177,12 @@ async def test_cart_add3(token_auth_admin):
         assert response.status_code == 201
 
 
+@pytest.mark.asyncio(loop_scope="session")
 async def test_cart_patch(token_auth_admin):
     """
     вывод списка товаров
     """
-    header = {"Authorization": f"Bearer {await token_auth_admin}"}
+    header = {"Authorization": f"Bearer {token_auth_admin}"}
     async with AsyncClient(
             transport=ASGITransport(app=app),
             base_url="http://localhost:8000"
@@ -190,11 +197,12 @@ async def test_cart_patch(token_auth_admin):
         assert response.status_code == 200
 
 
+@pytest.mark.asyncio(loop_scope="session")
 async def test_cart(token_auth_admin):
     """
     вывод списка товаров
     """
-    header = {"Authorization": f"Bearer {await token_auth_admin}"}
+    header = {"Authorization": f"Bearer {token_auth_admin}"}
     async with AsyncClient(
             transport=ASGITransport(app=app),
             base_url="http://localhost:8000"
@@ -208,12 +216,12 @@ async def test_cart(token_auth_admin):
         assert json.loads(result) == data
 
 
-
+@pytest.mark.asyncio(loop_scope="session")
 async def test_cart_del(token_auth_admin):
     """
     Очистка корзины
     """
-    header = {"Authorization": f"Bearer {await token_auth_admin}"}
+    header = {"Authorization": f"Bearer {token_auth_admin}"}
     async with AsyncClient(
             transport=ASGITransport(app=app),
             base_url="http://localhost:8000"
