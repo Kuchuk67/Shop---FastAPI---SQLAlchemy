@@ -132,7 +132,7 @@ async def cart_patch_quantity(
                                                )
 
 
-@router_cart.post("/remove_all/", response_model=list[CartGet])
+@router_cart.delete("/remove_all/", response_model=list[CartGet])
 @PermissionRole(["user"])
 async def cart_remove_all(
         session: AsyncSession = Depends(db_helper.session_dependency),

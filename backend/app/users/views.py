@@ -74,7 +74,7 @@ async def user_disable(
     return await crud.patch_user(user_id, user_patch_data, session=session)
 
 
-@router.post("/id-{user_id}/delete/")
+@router.delete("/id-{user_id}/delete/")
 @PermissionRole(["admin"])
 async def user_delete(
     user_id: int,
