@@ -53,7 +53,8 @@ async def test_registration():
                                      "full_name": "string",
                                      "email": "user@example.com",
                                      "phone": "+70349184258",
-                                     "password": "pSdeWD343#ads"
+                                     "password": "pSdeWD343#ads",
+                                     "password2": "pSdeWD343#ads"
                                  }
                                  )
         assert response.status_code == 201
@@ -103,7 +104,8 @@ async def test_registration_not_email():
                                      "full_name": "string",
                                      "email": "user@examplecom",
                                      "phone": "+70349522211",
-                                     "password": "pSdeWD343#ads"
+                                     "password": "pSdeWD343#ads",
+                                     "password2": "pSdeWD343#ads"
                                  }
                                  )
         assert response.status_code == 422
@@ -122,7 +124,8 @@ async def test_registration_not_phone1():
                                      "full_name": "string",
                                      "email": "user@example.com",
                                      "phone": "70349522211",
-                                     "password": "pSdeWD343#ads"
+                                     "password": "pSdeWD343#ads",
+                                     "password2": "pSdeWD343#ads"
                                  }
                                  )
         assert response.status_code == 422
@@ -132,7 +135,8 @@ async def test_registration_not_phone1():
                                      "full_name": "string",
                                      "email": "user@example.com",
                                      "phone": "+7900333221",
-                                     "password": "pSdeWD343#ads"
+                                     "password": "pSdeWD343#ads",
+                                     "password2": "pSdeWD343#ads"
                                  }
                                  )
         assert response.status_code == 422
@@ -142,7 +146,8 @@ async def test_registration_not_phone1():
                                      "full_name": "string",
                                      "email": "user@example.com",
                                      "phone": "+7 900 333 2121",
-                                     "password": "pSdeWD343#ads"
+                                     "password": "pSdeWD343#ads",
+                                     "password2": "pSdeWD343#ads"
                                  }
                                  )
         assert response.status_code == 422
@@ -152,7 +157,19 @@ async def test_registration_not_phone1():
                                      "full_name": "string",
                                      "email": "user@example.com",
                                      "phone": "+79003332121",
-                                     "password": "pSdeWDbbads"
+                                     "password": "3@Sbads",
+                                     "password2": "3@Sbads"
+                                 }
+                                 )
+        assert response.status_code == 422
+        # Пароли не одинаковые
+        response = await ac.post("/api/v1/registration/",
+                                 json={
+                                     "full_name": "string",
+                                     "email": "user@example.com",
+                                     "phone": "+79003332121",
+                                     "password": "3@SbWEg#657ads",
+                                     "password2": "3@SbWEg#657ad1"
                                  }
                                  )
         assert response.status_code == 422
@@ -170,7 +187,8 @@ async def test_duble_email():
                                      "full_name": "string",
                                      "email": "user@example.com",
                                      "phone": "+70349184251",
-                                     "password": "pSdeWDbbads"
+                                     "password": "pSd#eWDbbads",
+                                     "password2": "pSd#eWDbbads"
                                  }
                                  )
         assert response.status_code == 202
@@ -188,7 +206,8 @@ async def test_duble_phone():
                                      "full_name": "string",
                                      "email": "user1@example.com",
                                      "phone": "+70349184258",
-                                     "password": "pSdeWDbbads"
+                                     "password": "pSd#eWDbbads",
+                                     "password2": "pSd#eWDbbads"
                                  }
                                  )
         assert response.status_code == 202

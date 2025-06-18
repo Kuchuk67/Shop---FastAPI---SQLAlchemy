@@ -59,7 +59,8 @@ async def test_create_admin(session: AsyncSession = Depends(db_helper.session_de
                                      "full_name": "administrator",
                                      "email": "admin@example.com",
                                      "phone": "+79012345678",
-                                     "password": "pSSdsd343#ads"
+                                     "password": "pSSdsd343#ads",
+                                     "password2": "pSSdsd343#ads"
                                  })
         assert response.status_code == 201
         async_session = db_helper.session_factory

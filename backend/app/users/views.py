@@ -111,7 +111,11 @@ async def create_user(
     # Валидация пароля
     if not validate_pass(user_in.password):
         return JSONResponse(
-            content={"detail": "Пароль слишком простой"}, status_code=422
+            content={"detail": "The password is too simple"}, status_code=422
+        )
+    if user_in.password != user_in.password2:
+        return JSONResponse(
+            content={"detail": "The passwords do not match"}, status_code=422
         )
     else:
         user_in.password = get_password_hash(user_in.password)

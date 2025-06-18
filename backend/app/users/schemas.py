@@ -45,6 +45,7 @@ class UserCreate(UserBase):
     """
 
     password: str = Field(..., min_length=8)
+    password_2: str = Field(..., min_length=8)
     # ^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).*$
     # (?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$
 

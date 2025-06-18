@@ -120,7 +120,8 @@ async def test_create_user():
                                      "full_name": "string",
                                      "email": "user@example.com",
                                      "phone": "+79012345679",
-                                     "password": "pSSdsd343#ads"
+                                     "password": "pSSdsd343#ads",
+                                     "password2": "pSSdsd343#ads"
                                  })
     assert response.status_code == 201
 

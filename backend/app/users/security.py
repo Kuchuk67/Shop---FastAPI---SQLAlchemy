@@ -23,7 +23,7 @@ def validate_pass(password: str) -> bool:
     Проверка уровня сложности пароля
     """
     if re.fullmatch(r'(?=^.{8,}$)((?=.*\d)(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$', password):
-        return True
+            return True
     return False
 
 
