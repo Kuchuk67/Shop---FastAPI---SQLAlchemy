@@ -44,6 +44,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 # OAuth2PasswordBearer извлекает токен из заголовка "Authorization: Bearer <token>"
 # Параметр tokenUrl указывает маршрут, по которому клиенты смогут получить токен
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
@@ -74,8 +75,6 @@ def get_user_from_token(token: str = Depends(oauth2_scheme),
     Функция для извлечения информации о пользователе из токена.
     Проверяем токен и извлекаем утверждение о пользователе.
     """
-    print("\n\n\n\n\n\n\n**************\n\n\n\n\n", token)
-
     payload = jwt.decode(token, setting.SECRET_KEY, algorithms=[setting.ALGORITHM])
     try:
         payload = jwt.decode(token, setting.SECRET_KEY, algorithms=[setting.ALGORITHM])
@@ -124,6 +123,7 @@ async def get_current_user(current_userid: int = Depends(get_user_from_token),
     """
     Получаем текущего пользователя (из токена) по ID из бд
     """
+
     user = await get_user(current_userid, session=session)
     if user is not None:
         return user

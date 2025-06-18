@@ -187,8 +187,8 @@ async def test_duble_email():
                                      "full_name": "string",
                                      "email": "user@example.com",
                                      "phone": "+70349184251",
-                                     "password": "pSd#eWDbbads",
-                                     "password2": "pSd#eWDbbads"
+                                     "password": "3pSd#eWDbbads",
+                                     "password2": "3pSd#eWDbbads"
                                  }
                                  )
         assert response.status_code == 202
@@ -206,8 +206,8 @@ async def test_duble_phone():
                                      "full_name": "string",
                                      "email": "user1@example.com",
                                      "phone": "+70349184258",
-                                     "password": "pSd#eWDbbads",
-                                     "password2": "pSd#eWDbbads"
+                                     "password": "3pSd#eWDbbads",
+                                     "password2": "3pSd#eWDbbads"
                                  }
                                  )
         assert response.status_code == 202

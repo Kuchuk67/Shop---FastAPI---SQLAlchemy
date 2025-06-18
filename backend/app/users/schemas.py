@@ -45,7 +45,7 @@ class UserCreate(UserBase):
     """
 
     password: str = Field(..., min_length=8)
-    password_2: str = Field(..., min_length=8)
+    password2: str  = Field(..., exclude=True)
     # ^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).*$
     # (?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$
 

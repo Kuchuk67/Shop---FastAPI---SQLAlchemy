@@ -117,10 +117,10 @@ async def create_user(
         return JSONResponse(
             content={"detail": "The passwords do not match"}, status_code=422
         )
-    else:
-        user_in.password = get_password_hash(user_in.password)
-        # Передаем запрос в круд на создание пользователя
-        return await crud.create_user(user_in=user_in, session=session)
+
+    user_in.password = get_password_hash(user_in.password)
+    # Передаем запрос в круд на создание пользователя
+    return await crud.create_user(user_in=user_in, session=session)
 
 
 @router_authentication.post("/login/")

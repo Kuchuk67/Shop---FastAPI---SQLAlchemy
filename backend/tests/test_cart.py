@@ -135,7 +135,7 @@ async def test_cart_add(token_auth_admin):
                                  headers=header)
         assert response.status_code == 422
         assert response.content.decode(
-            "utf-8") == '{"detail":"Столько товара нет в наличии"}'
+            "utf-8") == '{"detail":"So many items are out of stock"}'
 
 
 @pytest.mark.asyncio(loop_scope="session")

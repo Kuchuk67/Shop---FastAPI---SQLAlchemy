@@ -54,9 +54,10 @@ async def cart_add(session: AsyncSession,
     cart = result.scalars().all()
 
     if not cart:
+        # Столько товара нет в наличии
         if product_in.quantity > product.quantity:
             return JSONResponse(
-                content={"detail": "Столько товара нет в наличии"},
+                content={"detail": "So many items are out of stock"},
                 status_code=422
             )
         product_in_cart = CartDB(user_id=current_user.id,
@@ -68,8 +69,9 @@ async def cart_add(session: AsyncSession,
         await session.commit()
         return product_in_cart
     else:
+        # Товар уже в корзине
         return JSONResponse(
-            content={"detail": "Товар уже в корзине"},
+            content={"detail": "The product is already in the cart"},
             status_code=422
         )
 
@@ -88,7 +90,7 @@ async def cart_gelete(session: AsyncSession,
             await session.delete(product_in_cart)
             await session.commit()
             return JSONResponse(
-                content={"detail": "Товар удален"},
+                content={"detail": "Product removed from cart"},
                 status_code=200
             )
         raise HTTPException(
@@ -146,6 +148,6 @@ async def cart_remove_all(session: AsyncSession, current_user: UserGet):
             status_code=status.HTTP_404_NOT_FOUND
         )
     return JSONResponse(
-        content={"detail": "Корзина удалена"},
+        content={"detail": "Cart removed"},
         status_code=200
     )
