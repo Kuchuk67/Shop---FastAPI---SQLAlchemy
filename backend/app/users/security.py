@@ -90,10 +90,7 @@ def get_user_from_token(token: str = Depends(oauth2_scheme),
             )
     else:
         try:
-            if refresh:
-                user_id: int = int(payload.get("iss"))
-            else:
-                user_id: int = int(payload.get("sub"))
+            user_id: int = int(payload.get("sub"))
         except:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -129,4 +126,33 @@ async def get_current_user(current_userid: int = Depends(get_user_from_token),
         return user
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
                         detail="User not found")
-    
+
+
+def get_user_from_refresh_token(
+        token: str = Depends(oauth2_scheme)
+        ) -> int | None:
+    """
+    Функция для извлечения информации о пользователе из refresh-токена.
+    """
+    try:
+        payload = jwt.decode(token, setting.SECRET_KEY, algorithms=[setting.ALGORITHM])
+        # Декодируем токен с помощью секретного ключа
+
+    # Возвращаем утверждение о пользователе (subject) из полезной нагрузки
+    except jwt.ExpiredSignatureError:
+        pass  # Обработка ошибки истечения срока действия токена
+    except jwt.InvalidTokenError:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Token is invalid"
+        )
+    else:
+        try:
+            user_id: int = int(payload.get("iss"))
+        except:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="User not found"
+            )
+        else:
+            return user_id
