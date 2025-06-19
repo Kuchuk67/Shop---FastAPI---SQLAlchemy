@@ -1,12 +1,14 @@
-import pytest
-import pytest_asyncio
-from httpx import ASGITransport, AsyncClient
-from main import app
-from fastapi import FastAPI
-from app.core.models import db_helper
 from contextlib import asynccontextmanager
 
-pytest_plugins = 'pytest_asyncio'
+import pytest
+import pytest_asyncio
+from fastapi import FastAPI
+from httpx import ASGITransport, AsyncClient
+
+from app.core.models import db_helper
+from main import app
+
+pytest_plugins = "pytest_asyncio"
 pytestmark = pytest.mark.asyncio
 
 
@@ -43,17 +45,15 @@ async def users_products():
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         async with db_helper.engine.begin() as conn:
-            app.dependency_overrides[db_helper.scoped_session_dependency] = override_get_async_session
+            app.dependency_overrides[db_helper.scoped_session_dependency] = (
+                override_get_async_session
+            )
             yield
 
     async with AsyncClient(
-            transport=ASGITransport(app=app),
-            base_url="http://localhost:8000"
+        transport=ASGITransport(app=app), base_url="http://localhost:8000"
     ) as ac, lifespan(app):
-        login_data = {
-            "login": "admin@example.com",
-            "password": "pSSdsd343#ads"
-        }
+        login_data = {"login": "admin@example.com", "password": "pSSdsd343#ads"}
         response = await ac.post("/api/v1/login/", json=login_data)
         assert response.status_code == 200
         token = response.json()["access_token"]
@@ -64,10 +64,12 @@ async def users_products():
             "description": "string",
             "price": 0,
             "quantity": 0,
-            "is_active": True
+            "is_active": True,
         }
 
-        response = await ac.post("/api/v1/products/add/", json=prod_data, headers=header)
+        response = await ac.post(
+            "/api/v1/products/add/", json=prod_data, headers=header
+        )
         assert response.status_code == 200
         return prod_data
 
@@ -75,13 +77,9 @@ async def users_products():
 @pytest_asyncio.fixture
 async def ttt():
     async with AsyncClient(
-            transport=ASGITransport(app=app),
-            base_url="http://localhost:8000"
+        transport=ASGITransport(app=app), base_url="http://localhost:8000"
     ) as ac:
-        login_data = {
-            "login": "user@example.com",
-            "password": "pass"
-        }
+        login_data = {"login": "user@example.com", "password": "pass"}
 
         response = await ac.post("/api/v1/login/", json=login_data)
         assert response.status_code == 200

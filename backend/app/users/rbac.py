@@ -1,5 +1,6 @@
-from fastapi import HTTPException, status
 from functools import wraps
+
+from fastapi import HTTPException, status
 
 
 class PermissionRole:
@@ -29,7 +30,7 @@ class PermissionRole:
 
             if (
                 user.roles not in self.roles
-            ) | user.disabled:  # not any(role in user.roles for role in self.roles):
+            ) | user.disabled:
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="Недостаточно прав для доступа",

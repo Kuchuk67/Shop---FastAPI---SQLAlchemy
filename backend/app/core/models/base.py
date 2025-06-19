@@ -1,11 +1,16 @@
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, declared_attr
+from sqlalchemy.orm import (DeclarativeBase,
+                            Mapped,
+                            declared_attr,
+                            mapped_column
+                            )
 
 
 class Base(DeclarativeBase):
-    '''
+    """
     Заготовка для всех таблиц БД
     с первичным полем 'id'
-    '''
+    """
+
     __abstract__ = True
 
     # Автоматом именуем таблицы по названию класса

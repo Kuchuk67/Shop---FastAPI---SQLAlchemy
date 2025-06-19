@@ -7,6 +7,6 @@ __all__ = (
 )
 
 from .base import Base
-from .users import User
 from .db_helper import db_helper
-from .shop import ProductShop, Cart
+from .shop import Cart, ProductShop
+from .users import User

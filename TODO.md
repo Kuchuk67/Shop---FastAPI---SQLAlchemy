@@ -64,3 +64,15 @@ pytest
 python demo_data.py\ 
 из файла start
 
+### Данные для демо-доступа:
+логин email или телефон\
+email: admin@example.com\
+phone: +71234567890\
+password: Qwerty11@
+
+логин email или телефон\
+email: user@example.com\
+phone: +71234567891\
+password: Qwerty11@
+
+
