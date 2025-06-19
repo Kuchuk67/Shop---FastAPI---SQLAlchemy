@@ -1,11 +1,11 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from fastapi.responses import JSONResponse
-from .security import verify_password, create_jwt_token, get_user_from_token
+from .security import verify_password, create_jwt_token, get_user_from_token, get_user_from_refresh_token
 from app.core.models import User as UserDB
 from config import setting
-from fastapi import Depends, HTTPException, status
-import jwt
+from fastapi import Depends
+
 
 async def login_user(user_in, session: AsyncSession):
     """
@@ -43,10 +43,20 @@ async def login_user(user_in, session: AsyncSession):
     )
 
 
-async def refresh_token(user_id: int = Depends(get_user_from_token)):
-
-    # Проверяем токен и извлекаем утверждение о пользователе.
-
-    return JSONResponse(
-        content={"detail": f" {user_id}"}, status_code=401
+async def refresh_token_create(current_user):
+    # Проверяем токен и обновляем
+    # Если проверка прошла успешно, генерируем токен для пользователя
+    token = create_jwt_token(
+        {"sub": str(current_user)}, setting.ACCESS_TOKEN_EXPIRE_MINUTES
+    )  # "sub" — это subject, в нашем случае имя пользователя
+    token_refresh = create_jwt_token(
+        {"iss": str(current_user)}, setting.FRESH_TOKEN_EXPIRE_MINUTES
     )
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "refresh_token": token_refresh,
+    }
+    #return JSONResponse(
+    #    content={"detail": f"*** {current_user}"}, status_code=401
+    #)

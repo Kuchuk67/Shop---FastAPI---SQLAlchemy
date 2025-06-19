@@ -4,11 +4,11 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from typing import Dict
 from config import setting
-from .schemas import User, UserGet
 from sqlalchemy.ext.asyncio import AsyncSession
 from passlib.context import CryptContext
 from app.core.models import db_helper
 from app.core.models.users import User as UserDB
+import re
 
 """
 Здесь функции хеширования паролей,
@@ -17,6 +17,16 @@ from app.core.models.users import User as UserDB
 """
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def validate_pass(password: str) -> bool:
+    """
+    Проверка уровня сложности пароля
+    """
+    if re.fullmatch(r'(?=^.{8,}$)((?=.*\d)(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$', password):
+            return True
+    return False
+
+
 
 def get_password_hash(password: str) -> str:
     """
@@ -34,6 +44,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 # OAuth2PasswordBearer извлекает токен из заголовка "Authorization: Bearer <token>"
 # Параметр tokenUrl указывает маршрут, по которому клиенты смогут получить токен
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
@@ -64,8 +75,6 @@ def get_user_from_token(token: str = Depends(oauth2_scheme),
     Функция для извлечения информации о пользователе из токена.
     Проверяем токен и извлекаем утверждение о пользователе.
     """
-    print("\n\n\n\n\n\n\n**************\n\n\n\n\n", token)
-
     payload = jwt.decode(token, setting.SECRET_KEY, algorithms=[setting.ALGORITHM])
     try:
         payload = jwt.decode(token, setting.SECRET_KEY, algorithms=[setting.ALGORITHM])
@@ -81,10 +90,7 @@ def get_user_from_token(token: str = Depends(oauth2_scheme),
             )
     else:
         try:
-            if refresh:
-                user_id: int = int(payload.get("iss"))
-            else:
-                user_id: int = int(payload.get("sub"))
+            user_id: int = int(payload.get("sub"))
         except:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -114,9 +120,39 @@ async def get_current_user(current_userid: int = Depends(get_user_from_token),
     """
     Получаем текущего пользователя (из токена) по ID из бд
     """
+
     user = await get_user(current_userid, session=session)
     if user is not None:
         return user
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
                         detail="User not found")
-    
+
+
+def get_user_from_refresh_token(
+        token: str = Depends(oauth2_scheme)
+        ) -> int | None:
+    """
+    Функция для извлечения информации о пользователе из refresh-токена.
+    """
+    try:
+        payload = jwt.decode(token, setting.SECRET_KEY, algorithms=[setting.ALGORITHM])
+        # Декодируем токен с помощью секретного ключа
+
+    # Возвращаем утверждение о пользователе (subject) из полезной нагрузки
+    except jwt.ExpiredSignatureError:
+        pass  # Обработка ошибки истечения срока действия токена
+    except jwt.InvalidTokenError:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Token is invalid"
+        )
+    else:
+        try:
+            user_id: int = int(payload.get("iss"))
+        except:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="User not found"
+            )
+        else:
+            return user_id

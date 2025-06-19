@@ -1,12 +1,14 @@
 from fastapi import APIRouter, Depends, Request
 from app.users import crud, authorization
 from app.users.schemas import LoginUser, UserGet, UserCreate, UserPatch
-from app.users.security import get_password_hash, get_current_user
+from app.users.security import get_password_hash, get_current_user, validate_pass, get_user_from_refresh_token, get_user_from_token
 from sqlalchemy.ext.asyncio import AsyncSession
 from config import setting
 from app.core.models import db_helper, User as UserDB
 from app.users.rbac import PermissionRole
 from fastapi.responses import JSONResponse
+from app.users.authorization import refresh_token_create
+import re
 
 # Добавляем префикс
 router = APIRouter(prefix=f"{setting.api_prefix}/users", tags=["Users"])
@@ -14,7 +16,7 @@ router_authentication = APIRouter(prefix=f"{setting.api_prefix}", tags=["Users_A
 
 
 @router.get("/list/", response_model=list[UserGet])
-@PermissionRole(["user"])
+@PermissionRole(["admin"])
 async def get_users_list(
     session: AsyncSession = Depends(db_helper.session_dependency),
     current_user: UserGet = Depends(get_current_user)
@@ -39,14 +41,14 @@ async def get_users(
                      "email": current_user.email,
                      "phone": current_user.phone,
                      "roles": current_user.roles,
-                     
+   
                      },
             status_code=200
         )
 
 
 @router.get("/id-{user_id}/", response_model=UserGet)
-@PermissionRole(["admin", "user"])
+@PermissionRole(["admin"])
 async def get_user(
     user_id: int, session: AsyncSession = Depends(db_helper.session_dependency),
     current_user: UserGet = Depends(get_current_user)
@@ -73,7 +75,7 @@ async def user_disable(
     return await crud.patch_user(user_id, user_patch_data, session=session)
 
 
-@router.post("/id-{user_id}/delete/")
+@router.delete("/id-{user_id}/delete/")
 @PermissionRole(["admin"])
 async def user_delete(
     user_id: int,
@@ -107,6 +109,16 @@ async def create_user(
     Принимем POST запрос на создание пользователя
     по схеме UserCreate
     """
+    # Валидация пароля
+    if not validate_pass(user_in.password):
+        return JSONResponse(
+            content={"detail": "The password is too simple"}, status_code=422
+        )
+    if user_in.password != user_in.password2:
+        return JSONResponse(
+            content={"detail": "The passwords do not match"}, status_code=422
+        )
+
     user_in.password = get_password_hash(user_in.password)
     # Передаем запрос в круд на создание пользователя
     return await crud.create_user(user_in=user_in, session=session)
@@ -125,11 +137,8 @@ async def login_user(
 
 
 @router_authentication.post("/refresh-token/")
-async def refresh_token(session: AsyncSession = Depends(db_helper.session_dependency)
-):
+async def refresh_token(current_user: UserGet = Depends(get_user_from_refresh_token)):
     """
-    проверяет учетные данные пользователя
-    и возвращает JWT токен, если данные правильные.\n
-    login: email пользователя или телефон +7..........
+    возвращает JWT токен..........
     """
-    return await authorization.refresh_token()
+    return await refresh_token_create(current_user)
