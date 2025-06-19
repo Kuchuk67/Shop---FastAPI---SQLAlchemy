@@ -96,7 +96,7 @@ async def test_product_add(token_auth_admin):
     Добавление товаров
     """
 
-    header = {"Authorization": f"Bearer {await token_auth_admin}"}
+    header = {"Authorization": f"Bearer {token_auth_admin}"}
     # rex = f"{await users_products}"
     async with AsyncClient(
             transport=ASGITransport(app=app),
@@ -119,7 +119,7 @@ async def test_products(token_auth_admin):
     """
     Вывод списка товаров
     """
-    header = {"Authorization": f"Bearer {await token_auth_admin}"}
+    header = {"Authorization": f"Bearer {token_auth_admin}"}
     async with AsyncClient(
             transport=ASGITransport(app=app),
             base_url="http://localhost:8000"
@@ -135,7 +135,7 @@ async def test_products_id(token_auth_admin):
     """
     Вывод товара по ID
     """
-    header = {"Authorization": f"Bearer {await token_auth_admin}"}
+    header = {"Authorization": f"Bearer {token_auth_admin}"}
     async with AsyncClient(
             transport=ASGITransport(app=app),
             base_url="http://localhost:8000"
@@ -149,7 +149,7 @@ async def test_products_patch(token_auth_admin):
     """
     Редактирование товара
     """
-    header = {"Authorization": f"Bearer {await token_auth_admin}"}
+    header = {"Authorization": f"Bearer {token_auth_admin}"}
     async with AsyncClient(
             transport=ASGITransport(app=app),
             base_url="http://localhost:8000"
@@ -172,7 +172,7 @@ async def test_products_delete(token_auth_admin):
     """
     Удаление товара
     """
-    header = {"Authorization": f"Bearer {await token_auth_admin}"}
+    header = {"Authorization": f"Bearer {token_auth_admin}"}
     async with AsyncClient(
             transport=ASGITransport(app=app),
             base_url="http://localhost:8000"

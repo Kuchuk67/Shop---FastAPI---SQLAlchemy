@@ -62,13 +62,13 @@ class Setting(BaseSettings):
             return (
                 f"postgresql+asyncpg://"
                 f"{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
-                f"@{self.POSTGRES_HOST}/{self.POSTGRES_DB}"
+                f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
             )
         else:
             return (
                 f"postgresql+asyncpg://"
                 f"{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
-                f"@{self.TEST_POSTGRES_HOST}/{self.TEST_POSTGRES_DB}"
+                f"@{self.TEST_POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.TEST_POSTGRES_DB}"
             )
 
 

@@ -16,10 +16,84 @@
 - Валидация **Pydentic**
 - Контейнеризация **Docker** и **Docker compose**
 
-- ## Авторизация пользователя
-- ## Каталог товаров (витрина)
-- ## Корзина покупок
+### Основная файловая структура проекта
+```
+backend
+   app
+	core
+	    models
+		... описание моделей и работа с БД
+	shopcase
+		... модуль каталога товаров
+	users
+		... модуль авторизации
+		authorization.py Аутантификация пользователя
+   tests
+      ... тесты
+   config.py
+   main.py
+   .env
+   ...
+docker-compose.yaml
+Dockerfile
+start
+README.md
+TODO.md
+```
 
+### Схема моделей проекта
+```
+    ---User---
++-- id
+|   full_name: str
+|   email: str
+|   phone: str
+|   password: str
+|   disabled: bool
+|   roles: str
+|
+|   ---Cart---
+|   id
++-< user_id: int
+    price: int
+    quantity: int
++-< product_id: int
+|  
+|
+|   ---ProductShop---
++-- id
+    name: str
+    description: str
+    price: int
+    quantity: int
+    created_at: datetime
+    updated_at: datetime
+    is_active: bool
+```
+
+
+- ## Авторизация пользователя
+Модуль Users app/users
+Обеспечивает регистрацию пользователей, аутентификацию пользователя и выдачу JWT, авторизацию и методы работы с моделью Users.
+Регистрация пользователя. 
+Принимает запрос с параметрами согластно api/v1/docs
+Проверки:
+- Уникальность полей email и phone
+- Валидность полей проверяется Pydentic согластно схеме
+- Валидность пароля проверяется регулярным выражнием
+Создает модель User в БД
+
+
+Аутентификация
+Принимает запрос с параметрами согластно api/v1/docs
+Проверки:
+Заполняю....
+
+- ## Каталог товаров (витрина)
+Заполняю....
+
+- ## Корзина покупок
+Заполняю....
 
 
 

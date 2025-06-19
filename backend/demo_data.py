@@ -1,16 +1,15 @@
 import asyncio
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker, declarative_base
-from sqlalchemy import Column, Integer
+from sqlalchemy.orm import sessionmaker
 from app.core.models.base import Base
-from sqlalchemy.orm import Mapped, mapped_column
 from passlib.context import CryptContext
 import random
 from app.core.models.users import User
 from app.core.models.shop import ProductShop, Cart
+from config import setting as set
 
 # --- Database setup ---
-DATABASE_URL = "postgresql+asyncpg://postgres:54321@localhost/test_shop"
+DATABASE_URL = f"postgresql+asyncpg://{set.POSTGRES_USER}:{set.POSTGRES_PASSWORD}@{set.POSTGRES_HOST}:{set.POSTGRES_PORT}/{set.POSTGRES_DB}"
 engine = create_async_engine(DATABASE_URL, echo=True)
 AsyncSessionLocal = sessionmaker(bind=engine,
                                  class_=AsyncSession,
@@ -19,27 +18,31 @@ AsyncSessionLocal = sessionmaker(bind=engine,
 
 # --- Insert function ---
 async def insert_user(user, user2, product, cart):
-    async with AsyncSessionLocal() as session:
-        async with session.begin():
-            session.add(user)
-            session.add(user2)
-            await session.commit()
-            
-    async with AsyncSessionLocal() as session:
-        async with session.begin():       
-            
-            # добавим товары
-            for item in product:
-                session.add(item)
-            await session.commit()
 
-    async with AsyncSessionLocal() as session:
-        async with session.begin():       
-            
-            # добавим товары
-            for item in cart:
-                session.add(item)
-            await session.commit()
+    try:
+        async with AsyncSessionLocal() as session:
+            async with session.begin():
+                session.add(user)
+                session.add(user2)
+                await session.commit()
+    except:
+        print("Демо-данные в БД не добавлены")
+    else:
+        async with AsyncSessionLocal() as session:
+            async with session.begin():
+
+                # добавим товары
+                for item in product:
+                    session.add(item)
+                await session.commit()
+
+        async with AsyncSessionLocal() as session:
+            async with session.begin():
+
+                # добавим товары
+                for item in cart:
+                    session.add(item)
+                await session.commit()
 
     
 
