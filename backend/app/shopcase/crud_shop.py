@@ -26,7 +26,11 @@ async def products_get_list(session: AsyncSession, page, limit) -> list[ProductS
     else:
         total_pages = count // limit + 1
 
-    stmt = select(ProductShopDB).offset(offset).limit(limit)
+    stmt = (select(ProductShopDB)
+            .filter(ProductShopDB.is_active == True)
+            .filter(ProductShopDB.quantity > 0)
+            .offset(offset)
+            .limit(limit))
     result: Result = await session.execute(stmt)
     products = result.scalars().all()
     if products is not None:

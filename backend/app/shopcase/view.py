@@ -23,10 +23,12 @@ router_cart = APIRouter(prefix=f"{setting.api_prefix}/cart", tags=["Cart"])
 
 
 @router_shop.get("/", response_model=list[ProductShopGet])
+@PermissionRole(["user"])
 async def products_get_list(
     page: int = 1,
     limit: int = 10,
     session: AsyncSession = Depends(db_helper.session_dependency),
+    current_user: UserGet = Depends(get_current_user),
 ) -> list[ProductShopDB]:
     """
     Выводит список товаров
@@ -61,7 +63,7 @@ async def products_add(
 
 
 @router_shop.patch("/id-{product_id}/", response_model=ProductShopGet)
-@PermissionRole(["user"])
+@PermissionRole(["admin"])
 async def products_edit(
     product_id: int,
     product_in: ProductShopPut,
