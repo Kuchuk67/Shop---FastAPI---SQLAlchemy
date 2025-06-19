@@ -1,6 +1,7 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
-from pathlib import Path
 import sys
+from pathlib import Path
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Конфигурация приложения
 # Константы должны быть прописаны в Файле .env
@@ -9,11 +10,11 @@ BASE_DIR = Path(__file__)
 
 
 class Setting(BaseSettings):
-   # DB_HOST: str
-   # DB_PORT: int
-   # DB_NAME: str
-   # DB_USER: str
-   # DB_PASSWORD: str
+    # DB_HOST: str
+    # DB_PORT: int
+    # DB_NAME: str
+    # DB_USER: str
+    # DB_PASSWORD: str
 
     POSTGRES_USER: str
     POSTGRES_DB: str
@@ -41,7 +42,7 @@ class Setting(BaseSettings):
     ROLES: str
 
     model_config = SettingsConfigDict(
-        env_file='.env',
+        env_file=".env",
         env_file_encoding="utf8",
         extra="ignore",
         case_sensitive=True,

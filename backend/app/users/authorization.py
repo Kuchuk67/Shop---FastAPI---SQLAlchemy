@@ -1,10 +1,14 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 from fastapi.responses import JSONResponse
-from .security import verify_password, create_jwt_token, get_user_from_token, get_user_from_refresh_token
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.core.models import User as UserDB
 from config import setting
-from fastapi import Depends
+
+from .security import (
+    create_jwt_token,
+    verify_password,
+)
 
 
 async def login_user(user_in, session: AsyncSession):
@@ -57,6 +61,6 @@ async def refresh_token_create(current_user):
         "token_type": "bearer",
         "refresh_token": token_refresh,
     }
-    #return JSONResponse(
+    # return JSONResponse(
     #    content={"detail": f"*** {current_user}"}, status_code=401
-    #)
+    # )

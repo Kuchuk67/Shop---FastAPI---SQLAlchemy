@@ -1,5 +1,6 @@
+from datetime import datetime, timedelta, timezone
+
 from pydantic import BaseModel, ConfigDict, Field
-from datetime import datetime, timezone, timedelta
 
 
 class ProductShop(BaseModel):
@@ -18,13 +19,10 @@ class ProductShopGet(ProductShop):
     """
     Получить данные по продукту,
     """
+
     id: int
-    created_at: datetime = Field(
-        default=datetime.now(timezone(timedelta(hours=3)))
-    )
-    updated_at: datetime = Field(
-        default=datetime.now(timezone(timedelta(hours=3)))
-    )
+    created_at: datetime = Field(default=datetime.now(timezone(timedelta(hours=3))))
+    updated_at: datetime = Field(default=datetime.now(timezone(timedelta(hours=3))))
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -38,6 +36,7 @@ class CartBase(BaseModel):
     """
     Описывает базовую модель корзины
     """
+
     quantity: int = Field(gt=0)
     product_id: int = Field(gt=0)
 
@@ -55,6 +54,7 @@ class CartGet(Cart):
     """
     Получить данные по корзине
     """
+
     id: int
     model_config = ConfigDict(from_attributes=True)
 
@@ -63,4 +63,5 @@ class CartPatch(CartBase):
     """
     Изменить количество товара в корзине
     """
+
     id: int

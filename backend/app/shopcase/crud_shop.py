@@ -1,12 +1,14 @@
 # CRUD - витрина продуктов
+from datetime import datetime
+
 from fastapi import HTTPException, status
-from app.shopcase.schemas import ProductShop, ProductShopGet, ProductShopPut
-from sqlalchemy.ext.asyncio import AsyncSession
-from app.core.models.shop import ProductShop as ProductShopDB
 from sqlalchemy import select
 from sqlalchemy.engine import Result
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import text
-from datetime import datetime
+
+from app.core.models.shop import ProductShop as ProductShopDB
+from app.shopcase.schemas import ProductShop, ProductShopGet, ProductShopPut
 
 
 async def products_get_list(session: AsyncSession, page, limit) -> list[ProductShopDB]:
@@ -15,7 +17,8 @@ async def products_get_list(session: AsyncSession, page, limit) -> list[ProductS
     """
     count = await session.execute(text("SELECT COUNT(*) FROM productshops"))
     count = count.scalars().one()
-    if page <= 0: page = 1
+    if page <= 0:
+        page = 1
     offset = (page - 1) * limit
 
     if count % limit == 0:
@@ -28,27 +31,22 @@ async def products_get_list(session: AsyncSession, page, limit) -> list[ProductS
     products = result.scalars().all()
     if products is not None:
         return list(products)
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND
-    )
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
-async def products_get(session: AsyncSession,
-                       id: int) -> ProductShopDB:
+async def products_get(session: AsyncSession, id: int) -> ProductShopDB:
     """
     Выводит один продукт по ID
     """
     product = await session.get(ProductShopDB, id)
     if product is not None:
         return product
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND
-    )
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
-async def products_add(session: AsyncSession,
-                       product_in: ProductShop
-                       ) -> ProductShopGet:
+async def products_add(
+    session: AsyncSession, product_in: ProductShop
+) -> ProductShopGet:
     """
     Добавляет продукт
     """
@@ -58,10 +56,9 @@ async def products_add(session: AsyncSession,
     return product  # type: ignore
 
 
-async def products_edit(session: AsyncSession,
-                        product_id: int,
-                        product_in: ProductShopPut
-                        ) -> ProductShopDB | None:
+async def products_edit(
+    session: AsyncSession, product_id: int, product_in: ProductShopPut
+) -> ProductShopDB | None:
     """
     Редактирует продукт
     """
@@ -74,9 +71,7 @@ async def products_edit(session: AsyncSession,
         await session.commit()
         await session.refresh(product)
         return product
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND
-    )
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
 async def products_delete(session: AsyncSession, product_id: int) -> ProductShopDB:
@@ -90,6 +85,4 @@ async def products_delete(session: AsyncSession, product_id: int) -> ProductShop
         await session.commit()
         await session.refresh(product)
         return product
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND
-    )
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)

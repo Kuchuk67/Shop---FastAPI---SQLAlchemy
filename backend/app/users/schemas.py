@@ -45,15 +45,17 @@ class UserCreate(UserBase):
     """
 
     password: str = Field(..., min_length=8)
-    password2: str  = Field(..., exclude=True)
+    password2: str = Field(..., exclude=True)
     # ^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).*$
     # (?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$
+
 
 class LoginUser(BaseModel):
     """
     Описывает модель запроса чтоб залогинится
     login: email пользователя или телефон +7..........
     """
+
     # login может быть телефоном или email
     login: str = Field(..., pattern=r"\+7[0-9]{10}|^\S+@\S+\.\S+$")
     password: str
@@ -62,4 +64,3 @@ class LoginUser(BaseModel):
 class UserPatch(BaseModel):
     disabled: bool | None
     roles: str | None
-
