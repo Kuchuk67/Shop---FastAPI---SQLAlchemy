@@ -33,7 +33,7 @@ services:
     image: postgres:16.3-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data_test/
-    hostname: db
+    hostname: test_db
     networks:
       - backend
     env_file:
