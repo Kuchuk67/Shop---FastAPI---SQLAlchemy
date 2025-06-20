@@ -82,9 +82,6 @@ def get_user_from_token(
     Функция для извлечения информации о пользователе из токена.
     Проверяем токен и извлекаем утверждение о пользователе.
     """
-    payload = jwt.decode(token, setting.SECRET_KEY,
-                         algorithms=[setting.ALGORITHM]
-                         )
     try:
         payload = jwt.decode(token, setting.SECRET_KEY,
                              algorithms=[setting.ALGORITHM]
