@@ -26,6 +26,9 @@ async def products_get_list(
          page = 1
     offset = (page - 1) * limit
 
+    if limit > 100:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
     # if count % limit == 0:
     #    total_pages = count / limit
     # else:
