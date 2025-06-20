@@ -56,7 +56,7 @@ class LoginUser(BaseModel):
     username: email пользователя или телефон +7..........
     """
 
-    # login может быть телефоном или email
+    # username может быть телефоном или email
     username: str = Field(..., pattern=r"\+7[0-9]{10}|^\S+@\S+\.\S+$")
     password: str
 

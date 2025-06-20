@@ -73,7 +73,7 @@ async def test_user_login_email():
     ) as ac:
         response = await ac.post(
             "/api/v1/login/",
-            json={"login": "user@example.com", "password": "pSdeWD343#ads"},
+            data={"username": "user@example.com", "password": "pSdeWD343#ads"},
         )
         assert literal_eval(response.content.decode("utf-8"))["token_type"] == "bearer"
 
@@ -87,7 +87,7 @@ async def test_user_login_phone():
     ) as ac:
         response = await ac.post(
             "/api/v1/login/",
-            json={"login": "+70349184258", "password": "pSdeWD343#ads"},
+            data={"username": "+70349184258", "password": "pSdeWD343#ads"},
         )
         assert literal_eval(response.content.decode("utf-8"))["token_type"] == "bearer"
 

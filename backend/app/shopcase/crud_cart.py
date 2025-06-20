@@ -21,9 +21,9 @@ async def cart_get_list(session: AsyncSession,
             .options(selectinload(CartDB.products)))
     result: Result = await session.execute(stmt)
     products_in_cart = result.scalars().all()
-    if products_in_cart is not None:
-        return list(products_in_cart)
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    # if products_in_cart is not None:
+    return list(products_in_cart)
+    # raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
 async def cart_add(

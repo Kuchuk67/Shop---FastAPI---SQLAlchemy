@@ -22,19 +22,6 @@ async def get_users(session: AsyncSession) -> list[UserDB]:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
-'''async def get_user_current(session: AsyncSession,
-                           current_user: UserGet
-                           ):
-    """
-    Выводит текущего пользователя
-    """
-    if UserGet is not None:
-        return UserGet
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND
-    )'''
-
-
 async def get_user(user_id, session: AsyncSession) -> UserDB:
     """
     Выводит пользователя по ID
