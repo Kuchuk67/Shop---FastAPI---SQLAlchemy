@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, computed_field
 
 
 class ProductShop(BaseModel):
@@ -65,12 +65,17 @@ class CartGet(Cart):
 
 class CartGetProduct(Cart):
     """
-    Получить данные по корзине
+    Получить данные по корзине c подвязкой товаров
     """
     id: int
+    #summa: int = summa_price()
     products:  ProductShopGet
     model_config = ConfigDict(from_attributes=True)
 
+    @computed_field
+    @property
+    def summa(self) -> str:
+        return self.price * self.quantity
 
 class CartPatch(CartBase):
     """
