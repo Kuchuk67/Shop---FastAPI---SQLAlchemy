@@ -26,6 +26,7 @@ class ProductShopGet(ProductShop):
     model_config = ConfigDict(from_attributes=True)
 
 
+
 class ProductShopPut(BaseModel):
     quantity: int = Field(ge=0)
     is_active: bool
@@ -56,7 +57,9 @@ class CartGet(Cart):
     """
 
     id: int
+    product:  ProductShopGet
     model_config = ConfigDict(from_attributes=True)
+
 
 
 class CartPatch(CartBase):
