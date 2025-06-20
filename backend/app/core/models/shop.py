@@ -21,6 +21,8 @@ class ProductShop(Base):
     updated_at: Mapped[datetime] = mapped_column(nullable=False, default=dt_l)
     is_active: Mapped[bool] = mapped_column(default=False)
 
+    cart: Mapped["Cart"] = relationship(back_populates="products")
+
 
 class Cart(Base):
     user_id: Mapped[int] = mapped_column(
@@ -35,3 +37,4 @@ class Cart(Base):
     quantity: Mapped[int] = mapped_column(default=1)
 
     user: Mapped["User"] = relationship(back_populates="cart")
+    products: Mapped["ProductShop"] = relationship(back_populates="cart")

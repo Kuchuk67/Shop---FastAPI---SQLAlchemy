@@ -180,4 +180,4 @@ async def test_products_delete(token_auth_admin):
         response = await ac.get("/api/v1/products/?page=0&limit=100", headers=header)
         assert response.status_code == 200
         data = json.loads(response.content)
-        assert len(data) == 14
+        assert len(data) == 13

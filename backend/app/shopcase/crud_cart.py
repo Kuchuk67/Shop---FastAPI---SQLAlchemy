@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy import select
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.core.models.shop import Cart as CartDB
 from app.core.models.shop import ProductShop as ProductShopDB
@@ -15,7 +16,7 @@ async def cart_get_list(session: AsyncSession, current_user: UserGet) -> list[Ca
     """
     Выводит товары в корзине
     """
-    stmt = select(CartDB).filter(CartDB.user_id == current_user.id)
+    stmt = select(CartDB).filter(CartDB.user_id == current_user.id).options(selectinload(CartDB.products))
     result: Result = await session.execute(stmt)
     products_in_cart = result.scalars().all()
     if products_in_cart is not None:
