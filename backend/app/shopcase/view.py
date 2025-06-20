@@ -19,8 +19,12 @@ from app.users.security import get_current_user
 from config import setting
 
 # Добавляем префикс
-router_shop = APIRouter(prefix=f"{setting.api_prefix}/products", tags=["Product"])
-router_cart = APIRouter(prefix=f"{setting.api_prefix}/cart", tags=["Cart"])
+router_shop = APIRouter(prefix=f"{setting.api_prefix}/products",
+                        tags=["Product"]
+                        )
+router_cart = APIRouter(prefix=f"{setting.api_prefix}/cart",
+                        tags=["Cart"]
+                        )
 
 
 @router_shop.get("/", response_model=list[ProductShopGet])
@@ -34,7 +38,10 @@ async def products_get_list(
     """
     Выводит список товаров
     """
-    return await crud_shop.products_get_list(session=session, page=page, limit=limit)
+    return await crud_shop.products_get_list(session=session,
+                                             page=page,
+                                             limit=limit
+                                             )
 
 
 @router_shop.get("/id-{product_id}/", response_model=ProductShopGet)
@@ -89,7 +96,9 @@ async def products_delete(
     """
     Удаляет продукт (обнуляет количество)
     """
-    return await crud_shop.products_delete(session=session, product_id=product_id)
+    return await crud_shop.products_delete(session=session,
+                                           product_id=product_id
+                                           )
 
 
 # Корзина router_cart /cart
@@ -104,7 +113,10 @@ async def cart_get_list(
     """
     Выводит товары в корзине
     """
-    return await crud_cart.cart_get_list(session=session, current_user=current_user)
+    return await crud_cart.cart_get_list(
+        session=session,
+        current_user=current_user
+    )
 
 
 @router_cart.post("/add/", response_model=CartGet, status_code=201)

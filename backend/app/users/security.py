@@ -20,6 +20,7 @@ from config import setting
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+
 def validate_pass(password: str) -> bool:
     """
     Проверка уровня сложности пароля
@@ -51,7 +52,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 # Параметр tokenUrl указывает маршрут,
 # по которому клиенты смогут получить токен
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"api/v1/login")
 
 
 # Функция для создания JWT токена с заданным временем жизни
@@ -83,7 +84,8 @@ def get_user_from_token(
     Проверяем токен и извлекаем утверждение о пользователе.
     """
     try:
-        payload = jwt.decode(token, setting.SECRET_KEY,
+        payload = jwt.decode(token,
+                             setting.SECRET_KEY,
                              algorithms=[setting.ALGORITHM]
                              )
         # Декодируем токен с помощью секретного ключа

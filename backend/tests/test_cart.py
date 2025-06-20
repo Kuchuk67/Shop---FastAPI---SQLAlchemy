@@ -91,10 +91,11 @@ async def token_auth_admin():
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://localhost:8000"
     ) as ac:
-        login_data = {"login": "admin@example.com", "password": "pSdeWD343#ads"}
-        response = await ac.post("/api/v1/login/", json=login_data)
+        login_data = {"username": "admin@example.com", "password": "pSdeWD343#ads"}
+        response = await ac.post("/api/v1/login/", data=login_data)
         assert response.status_code == 200
     token = response.json()["access_token"]
+    
     return token
 
 
@@ -104,7 +105,7 @@ async def test_product_add(token_auth_admin):
     вывод текущего пользователя
     """
 
-    header = {"Authorization": f"Bearer {token_auth_admin}"}
+    header = {"Authorization": f"Bearer {await token_auth_admin}"}
     # rex = f"{await users_products}"
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://localhost:8000"
@@ -126,9 +127,9 @@ async def test_product_add(token_auth_admin):
 @pytest.mark.asyncio(loop_scope="session")
 async def test_cart_add(token_auth_admin):
     """
-    вывод списка товаров
+    Добавить в корзину сильно много товара
     """
-    header = {"Authorization": f"Bearer {token_auth_admin}"}
+    header = {"Authorization": f"Bearer {await token_auth_admin}"}
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://localhost:8000"
     ) as ac:
@@ -144,9 +145,9 @@ async def test_cart_add(token_auth_admin):
 @pytest.mark.asyncio(loop_scope="session")
 async def test_cart_add2(token_auth_admin):
     """
-    вывод списка товаров
+    Добавить в корзину
     """
-    header = {"Authorization": f"Bearer {token_auth_admin}"}
+    header = {"Authorization": f"Bearer {await token_auth_admin}"}
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://localhost:8000"
     ) as ac:
@@ -158,9 +159,9 @@ async def test_cart_add2(token_auth_admin):
 @pytest.mark.asyncio(loop_scope="session")
 async def test_cart_add3(token_auth_admin):
     """
-    вывод списка товаров
+    Добавить в корзину
     """
-    header = {"Authorization": f"Bearer {token_auth_admin}"}
+    header = {"Authorization": f"Bearer {await token_auth_admin}"}
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://localhost:8000"
     ) as ac:
@@ -170,11 +171,32 @@ async def test_cart_add3(token_auth_admin):
 
 
 @pytest.mark.asyncio(loop_scope="session")
+async def test_cart_add4(token_auth_admin):
+    """
+    Добавить в корзину похожий
+    """
+    header = {"Authorization": f"Bearer {await token_auth_admin}"}
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://localhost:8000"
+    ) as ac:
+        data = {"quantity": 8, "product_id": 12}
+        response = await ac.post("/api/v1/cart/add/", 
+                                 json=data, 
+                                 headers=header)
+        assert response.status_code == 422
+        assert (
+            response.content.decode("utf-8")
+            == '{"detail":"The product is already in the cart"}'
+        )
+        
+
+
+@pytest.mark.asyncio(loop_scope="session")
 async def test_cart_patch(token_auth_admin):
     """
-    вывод списка товаров
+    Изменить количество в корзине
     """
-    header = {"Authorization": f"Bearer {token_auth_admin}"}
+    header = {"Authorization": f"Bearer {await token_auth_admin}"}
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://localhost:8000"
     ) as ac:
@@ -188,17 +210,17 @@ async def test_cart(token_auth_admin):
     """
     вывод списка товаров
     """
-    header = {"Authorization": f"Bearer {token_auth_admin}"}
+    header = {"Authorization": f"Bearer {await token_auth_admin}"}
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://localhost:8000"
     ) as ac:
         response = await ac.get("/api/v1/cart/", headers=header)
         assert response.status_code == 200
-        data = [
-            {"quantity": 2, "product_id": 5, "user_id": 1, "price": 5000, "id": 1},
-            {"quantity": 3, "product_id": 12, "user_id": 1, "price": 12000, "id": 2},
-        ]
-        result = response.content.decode("utf-8")
+        # data = [
+        #     {"quantity": 2, "product_id": 5, "user_id": 1, "price": 5000, "id": 1},
+        #     {"quantity": 3, "product_id": 12, "user_id": 1, "price": 12000, "id": 2},
+        # ]
+        # result = response.content.decode("utf-8")
         # assert json.loads(result) == data # будут другие ответы
 
 
@@ -207,7 +229,7 @@ async def test_cart_del(token_auth_admin):
     """
     Очистка корзины
     """
-    header = {"Authorization": f"Bearer {token_auth_admin}"}
+    header = {"Authorization": f"Bearer {await token_auth_admin}"}
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://localhost:8000"
     ) as ac:

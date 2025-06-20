@@ -89,8 +89,8 @@ async def token_auth_user():
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://localhost:8000"
     ) as ac:
-        login_data = {"login": "user@example.com", "password": "pSSdsd343#ads"}
-        response = await ac.post("/api/v1/login/", json=login_data)
+        login_data = {"username": "user@example.com", "password": "pSSdsd343#ads"}
+        response = await ac.post("/api/v1/login/", data=login_data)
         assert response.status_code == 200
     token = response.json()["access_token"]
     return token
@@ -105,8 +105,8 @@ async def token_auth_admin():
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://localhost:8000"
     ) as ac:
-        login_data = {"login": "admin@example.com", "password": "pSSdsd343#ads"}
-        response = await ac.post("/api/v1/login/", json=login_data)
+        login_data = {"username": "admin@example.com", "password": "pSSdsd343#ads"}
+        response = await ac.post("/api/v1/login/", data=login_data)
         assert response.status_code == 200
     token = response.json()["access_token"]
     return token
@@ -136,7 +136,7 @@ async def test_user_list(token_auth_admin, users_all):
     """
     вывод всех пользователей
     """
-    header = {"Authorization": f"Bearer {token_auth_admin}"}
+    header = {"Authorization": f"Bearer {await token_auth_admin}"}
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://localhost:8000"
     ) as ac:
@@ -150,7 +150,7 @@ async def test_user_profile(token_auth_admin, users_one):
     """
     вывод текущего пользователя
     """
-    header = {"Authorization": f"Bearer {token_auth_admin}"}
+    header = {"Authorization": f"Bearer {await token_auth_admin}"}
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://localhost:8000"
     ) as ac:
@@ -164,7 +164,7 @@ async def test_user_id(token_auth_admin, users_one_2):
     """
     вывод пользователя по ID
     """
-    header = {"Authorization": f"Bearer {token_auth_admin}"}
+    header = {"Authorization": f"Bearer {await token_auth_admin}"}
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://localhost:8000"
     ) as ac:
@@ -178,7 +178,7 @@ async def test_user_patch(token_auth_admin, users_one_3):
     """
     деактивация пользователя
     """
-    header = {"Authorization": f"Bearer {token_auth_admin}"}
+    header = {"Authorization": f"Bearer {await token_auth_admin}"}
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://localhost:8000"
     ) as ac:
@@ -195,7 +195,7 @@ async def test_user_del(token_auth_admin):
     """
     деактивация пользователя
     """
-    header = {"Authorization": f"Bearer {token_auth_admin}"}
+    header = {"Authorization": f"Bearer {await token_auth_admin}"}
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://localhost:8000"
     ) as ac:

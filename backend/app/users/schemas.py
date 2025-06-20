@@ -53,14 +53,20 @@ class UserCreate(UserBase):
 class LoginUser(BaseModel):
     """
     Описывает модель запроса чтоб залогинится
-    login: email пользователя или телефон +7..........
+    username: email пользователя или телефон +7..........
     """
 
-    # login может быть телефоном или email
-    login: str = Field(..., pattern=r"\+7[0-9]{10}|^\S+@\S+\.\S+$")
+    # username может быть телефоном или email
+    username: str = Field(..., pattern=r"\+7[0-9]{10}|^\S+@\S+\.\S+$")
     password: str
 
 
 class UserPatch(BaseModel):
     disabled: bool | None
     roles: str | None
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str = Field("bearer")
+    refresh_token: str
