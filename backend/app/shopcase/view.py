@@ -8,6 +8,7 @@ from app.shopcase import crud_cart, crud_shop
 from app.shopcase.schemas import (
     CartBase,
     CartGet,
+    CartGetProduct,
     ProductShop,
     ProductShopGet,
     ProductShopPut,
@@ -94,7 +95,7 @@ async def products_delete(
 # Корзина router_cart /cart
 
 
-@router_cart.get("/", response_model=list[CartGet])
+@router_cart.get("/", response_model=list[CartGetProduct])
 @PermissionRole(["user"])
 async def cart_get_list(
     session: AsyncSession = Depends(db_helper.session_dependency),

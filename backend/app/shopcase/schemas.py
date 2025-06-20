@@ -57,6 +57,14 @@ class CartGet(Cart):
     """
 
     id: int
+    model_config = ConfigDict(from_attributes=True)
+
+class CartGetProduct(Cart):
+    """
+    Получить данные по корзине
+    """
+
+    id: int
     products:  ProductShopGet
     model_config = ConfigDict(from_attributes=True)
 
