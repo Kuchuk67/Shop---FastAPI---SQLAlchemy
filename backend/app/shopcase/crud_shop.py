@@ -32,7 +32,7 @@ async def products_get_list(
     #    total_pages = count // limit + 1
 
     stmt = (select(ProductShopDB)
-            .filter(ProductShopDB.is_active is True)
+            .filter(ProductShopDB.is_active == True)
             .filter(ProductShopDB.quantity > 0)
             .offset(offset)
             .limit(limit))
