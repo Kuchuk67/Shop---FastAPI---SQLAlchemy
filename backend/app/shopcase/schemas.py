@@ -57,7 +57,7 @@ class CartGet(Cart):
     """
 
     id: int
-    product:  ProductShopGet
+    products:  ProductShopGet
     model_config = ConfigDict(from_attributes=True)
 
 
