@@ -1,0 +1,53 @@
+services:
+
+  db:
+    restart: always
+    image: postgres:16.3-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    hostname: db
+    networks:
+      - backend
+    env_file:
+      - ./backend/.env
+
+
+  web:
+    restart: always
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    command: /start
+    ports:
+      - 8000:8000
+    env_file:
+      - ./backend/.env
+    networks:
+      - backend
+    depends_on: 
+      - db
+
+
+  test_db:
+    restart: always
+    image: postgres:16.3-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data_test/
+    hostname: test_db
+    networks:
+      - backend
+    env_file:
+      - ./backend/.env
+    environment:
+            - TEST_POSTGRES_HOST=test_db
+            - TEST_POSTGRES_DB=postgres
+
+volumes:
+  postgres_data:
+
+
+networks:
+  backend:
+    driver: bridge
+  frontend:
+    driver: bridge

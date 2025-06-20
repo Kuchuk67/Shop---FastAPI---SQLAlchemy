@@ -1,0 +1,22 @@
+# Подключение БД
+
+POSTGRES_USER=postgres
+POSTGRES_DB=postgres
+POSTGRES_HOST=db
+POSTGRES_PASSWORD=54321
+POSTGRES_PORT=5432
+
+TEST_POSTGRES_HOST=test_db
+TEST_POSTGRES_DB=postgres
+
+DEBAG=False
+
+SECRET_KEY=
+ACCESS_TOKEN_EXPIRE_MINUTES=15
+FRESH_TOKEN_EXPIRE_MINUTES=1080
+
+    # Алгоритм шифрования токена
+ALGORITHM=HS256
+
+    # Кортеж ролей пользователей
+ROLES=admin,user
