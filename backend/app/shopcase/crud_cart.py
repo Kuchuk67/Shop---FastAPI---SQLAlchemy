@@ -12,11 +12,13 @@ from app.shopcase.schemas import CartBase
 from app.users.schemas import UserGet
 
 
-async def cart_get_list(session: AsyncSession, current_user: UserGet) -> list[CartDB]:
+async def cart_get_list(session: AsyncSession,
+                        current_user: UserGet) -> list[CartDB]:
     """
     Выводит товары в корзине
     """
-    stmt = select(CartDB).filter(CartDB.user_id == current_user.id).options(selectinload(CartDB.products))
+    stmt = (select(CartDB).filter(CartDB.user_id == current_user.id)
+            .options(selectinload(CartDB.products)))
     result: Result = await session.execute(stmt)
     products_in_cart = result.scalars().all()
     if products_in_cart is not None:
@@ -56,7 +58,8 @@ async def cart_add(
         # Столько товара нет в наличии
         if product_in.quantity > product.quantity:
             return JSONResponse(
-                content={"detail": "So many items are out of stock"}, status_code=422
+                content={"detail": "So many items are out of stock"},
+                status_code=422
             )
         product_in_cart = CartDB(
             user_id=current_user.id,
@@ -70,11 +73,14 @@ async def cart_add(
     else:
         # Товар уже в корзине
         return JSONResponse(
-            content={"detail": "The product is already in the cart"}, status_code=422
+            content={"detail": "The product is already in the cart"},
+            status_code=422
         )
 
 
-async def cart_gelete(session: AsyncSession, current_user: UserGet, cart_id: int):
+async def cart_gelete(session: AsyncSession,
+                      current_user: UserGet,
+                      cart_id: int):
     """
     Удаляет товар из корзины
     """
@@ -88,7 +94,8 @@ async def cart_gelete(session: AsyncSession, current_user: UserGet, cart_id: int
             await session.delete(product_in_cart)
             await session.commit()
             return JSONResponse(
-                content={"detail": "Product removed from cart"}, status_code=200
+                content={"detail": "Product removed from cart"},
+                status_code=200
             )
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
     else:

@@ -5,29 +5,34 @@ from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.sql import text
+# from sqlalchemy.sql import text
 
 from app.core.models.shop import ProductShop as ProductShopDB
 from app.shopcase.schemas import ProductShop, ProductShopGet, ProductShopPut
 
 
-async def products_get_list(session: AsyncSession, page, limit) -> list[ProductShopDB]:
+async def products_get_list(
+        session: AsyncSession,
+        page,
+        limit
+) -> list[ProductShopDB]:
     """
     Выводит список продуктов
     """
-    count = await session.execute(text("SELECT COUNT(*) FROM productshops"))
-    count = count.scalars().one()
+    # Тут возможен подсчет количества страниц
+    # count = await session.execute(text("SELECT COUNT(*) FROM productshops"))
+    # count = count.scalars().one()
     if page <= 0:
-        page = 1
+         page = 1
     offset = (page - 1) * limit
 
-    if count % limit == 0:
-        total_pages = count / limit
-    else:
-        total_pages = count // limit + 1
+    # if count % limit == 0:
+    #    total_pages = count / limit
+    # else:
+    #    total_pages = count // limit + 1
 
     stmt = (select(ProductShopDB)
-            .filter(ProductShopDB.is_active == True)
+            .filter(ProductShopDB.is_active is True)
             .filter(ProductShopDB.quantity > 0)
             .offset(offset)
             .limit(limit))
@@ -78,7 +83,9 @@ async def products_edit(
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
-async def products_delete(session: AsyncSession, product_id: int) -> ProductShopDB:
+async def products_delete(session: AsyncSession,
+                          product_id: int
+                          ) -> ProductShopDB:
     """
     Удаляет продукт (обнуляет количество)
     """

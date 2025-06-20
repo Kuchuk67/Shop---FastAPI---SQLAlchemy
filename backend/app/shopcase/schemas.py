@@ -21,10 +21,13 @@ class ProductShopGet(ProductShop):
     """
 
     id: int
-    created_at: datetime = Field(default=datetime.now(timezone(timedelta(hours=3))))
-    updated_at: datetime = Field(default=datetime.now(timezone(timedelta(hours=3))))
+    created_at: datetime = Field(
+        default=datetime.now(timezone(timedelta(hours=3)))
+    )
+    updated_at: datetime = Field(
+        default=datetime.now(timezone(timedelta(hours=3)))
+    )
     model_config = ConfigDict(from_attributes=True)
-
 
 
 class ProductShopPut(BaseModel):
@@ -59,20 +62,18 @@ class CartGet(Cart):
     id: int
     model_config = ConfigDict(from_attributes=True)
 
+
 class CartGetProduct(Cart):
     """
     Получить данные по корзине
     """
-
     id: int
     products:  ProductShopGet
     model_config = ConfigDict(from_attributes=True)
-
 
 
 class CartPatch(CartBase):
     """
     Изменить количество товара в корзине
     """
-
     id: int

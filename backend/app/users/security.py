@@ -20,6 +20,7 @@ from config import setting
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+
 def validate_pass(password: str) -> bool:
     """
     Проверка уровня сложности пароля
@@ -82,11 +83,9 @@ def get_user_from_token(
     Функция для извлечения информации о пользователе из токена.
     Проверяем токен и извлекаем утверждение о пользователе.
     """
-    payload = jwt.decode(token, setting.SECRET_KEY,
-                         algorithms=[setting.ALGORITHM]
-                         )
     try:
-        payload = jwt.decode(token, setting.SECRET_KEY,
+        payload = jwt.decode(token,
+                             setting.SECRET_KEY,
                              algorithms=[setting.ALGORITHM]
                              )
         # Декодируем токен с помощью секретного ключа
