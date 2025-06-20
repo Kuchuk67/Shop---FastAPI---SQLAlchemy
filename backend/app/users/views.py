@@ -10,7 +10,8 @@ from app.users.rbac import PermissionRole
 from app.users.schemas import (LoginUser,
                                UserCreate,
                                UserGet,
-                               UserPatch)
+                               UserPatch,
+                               Token)
 from app.users.security import (
     get_current_user,
     get_password_hash,
@@ -110,8 +111,9 @@ async def user_delete(
 
 
 @router_authentication.post("/registration/",
-                            status_code=201
-                            )
+                            status_code=201,
+                            response_model=UserGet
+                            ) 
 async def create_user(
         user_in: UserCreate,
         session: AsyncSession = Depends(db_helper.session_dependency)
@@ -137,7 +139,7 @@ async def create_user(
     return await crud.create_user(user_in=user_in, session=session)
 
 
-@router_authentication.post("/login/")
+@router_authentication.post("/login/", response_model=Token) 
 async def login_user(
         # user_in: LoginUser,
         user_in: OAuth2PasswordRequestForm = Depends(),
@@ -151,7 +153,7 @@ async def login_user(
     return await authorization.login_user(user_in=user_in, session=session)
 
 
-@router_authentication.post("/refresh-token/")
+@router_authentication.post("/refresh-token/", response_model=Token)
 async def refresh_token(
         current_user: UserGet = Depends(get_user_from_refresh_token)
 ):

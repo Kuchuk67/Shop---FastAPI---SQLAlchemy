@@ -64,3 +64,9 @@ class LoginUser(BaseModel):
 class UserPatch(BaseModel):
     disabled: bool | None
     roles: str | None
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str = Field("bearer")
+    refresh_token: str
