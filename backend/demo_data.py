@@ -59,7 +59,7 @@ async def main():
         email="admin@example.com",
         phone="+71234567890",
         password=pwd_context.hash("Qwerty11@"),
-        id=1,
+        #id=100000,
         disabled=False,
         roles="admin",
     )
@@ -68,7 +68,7 @@ async def main():
         email="user@example.com",
         phone="+71234567891",
         password=pwd_context.hash("Qwerty11@"),
-        id=2,
+        #id=100001,
         disabled=False,
         roles="user",
     )

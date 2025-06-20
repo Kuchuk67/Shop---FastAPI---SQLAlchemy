@@ -18,6 +18,9 @@ from app.users.security import (
     validate_pass
 )
 from config import setting
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/login")
 
 # Добавляем префикс
 router = APIRouter(prefix=f"{setting.api_prefix}/users",
@@ -136,7 +139,8 @@ async def create_user(
 
 @router_authentication.post("/login/")
 async def login_user(
-        user_in: LoginUser,
+        # user_in: LoginUser,
+        user_in: OAuth2PasswordRequestForm = Depends(),
         session: AsyncSession = Depends(db_helper.session_dependency)
 ):
     """

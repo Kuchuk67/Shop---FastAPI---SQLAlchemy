@@ -52,7 +52,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 # Параметр tokenUrl указывает маршрут,
 # по которому клиенты смогут получить токен
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"api/v1/login")
 
 
 # Функция для создания JWT токена с заданным временем жизни

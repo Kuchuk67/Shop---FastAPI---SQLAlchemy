@@ -53,11 +53,11 @@ class UserCreate(UserBase):
 class LoginUser(BaseModel):
     """
     Описывает модель запроса чтоб залогинится
-    login: email пользователя или телефон +7..........
+    username: email пользователя или телефон +7..........
     """
 
     # login может быть телефоном или email
-    login: str = Field(..., pattern=r"\+7[0-9]{10}|^\S+@\S+\.\S+$")
+    username: str = Field(..., pattern=r"\+7[0-9]{10}|^\S+@\S+\.\S+$")
     password: str
 
 

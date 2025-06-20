@@ -15,11 +15,11 @@ async def login_user(user_in, session: AsyncSession):
     """
     Авторизация пользователя
     """
-    if "@" in user_in.login:
-        statement = select(UserDB).where(UserDB.email == user_in.login)
+    if "@" in user_in.username:
+        statement = select(UserDB).where(UserDB.email == user_in.username)
     else:
-        # user_in.login = user_in.login[2:]
-        statement = select(UserDB).where(UserDB.phone == user_in.login)
+        # user_in.username = user_in.username[2:]
+        statement = select(UserDB).where(UserDB.phone == user_in.username)
     result = await session.execute(statement)
     users = result.scalars().first()
     if users:
