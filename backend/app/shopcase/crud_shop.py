@@ -41,9 +41,9 @@ async def products_get_list(
             .limit(limit))
     result: Result = await session.execute(stmt)
     products = result.scalars().all()
-    if products is not None:
-        return list(products)
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    #if products is not None:
+    return list(products)
+    #raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
 async def products_get(session: AsyncSession, id: int) -> ProductShopDB:

@@ -167,3 +167,18 @@ async def cart_remove_all(
         session=session,
         current_user=current_user,
     )
+
+
+@router_cart.get("/sum", response_model=int)
+@PermissionRole(["user"])
+async def cart_summa(
+    session: AsyncSession = Depends(db_helper.session_dependency),
+    current_user: UserGet = Depends(get_current_user),
+) -> int:
+    """
+    Выводит общую сумму по корзине
+    """
+    return await crud_cart.cart_sum(
+        session=session,
+        current_user=current_user
+    )
