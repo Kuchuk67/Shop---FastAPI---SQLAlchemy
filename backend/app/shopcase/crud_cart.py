@@ -1,7 +1,7 @@
 # CRUD - Корзина
 from fastapi import HTTPException, status
 from fastapi.responses import JSONResponse
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -143,3 +143,21 @@ async def cart_remove_all(session: AsyncSession, current_user: UserGet):
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return JSONResponse(content={"detail": "Cart removed"}, status_code=200)
+
+
+async def cart_sum(session: AsyncSession,
+                        current_user: UserGet) -> int:
+    """
+    Возвращает общую стоимость товаров в корзине пользователя.
+    """
+    stmt = select(
+        func.sum(CartDB.quantity * CartDB.price)
+    ).where(CartDB.user_id == current_user.id)
+
+    result: Result = await session.execute(stmt)
+    summa = result.scalar()
+    if not summa:
+        summa = 0
+    return summa
+
+    # raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
