@@ -117,8 +117,11 @@ async def get_user(user_id: int,
     Получаем пользователя по ID
     """
     user = await session.get(UserDB, user_id)
+
+
     if user is not None:
-        return user
+        if not user.disabled:
+            return user
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                         detail="User not found"
                         )
